@@ -4,6 +4,7 @@ import Excepciones.DatabaseDeleteException;
 import Excepciones.DatabaseInsertException;
 import com.db4o.query.Query;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,18 @@ public abstract class BaseImplementation<T> {
      */
     private Class<?> getClassType() {
         return this.getClass().getSuperclass();
+    }
+
+    /**
+     * Uses Java Reflection to retrieve all the fields inside a class and prints them to the user.
+     */
+    protected void printObjectFields() {
+        Field[] fields = this.getClass().getDeclaredFields();
+
+        for (int i = 0; i < fields.length; i++) {
+            fields[i].setAccessible(true);
+            System.out.println((i + 1) + ". " + fields[i].getName());
+        }
     }
 
     /**
