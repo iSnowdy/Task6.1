@@ -6,18 +6,37 @@ import Excepciones.DatabaseOpeningException;
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 
-public class DatabaseManager implements DatabaseImplementation {
+/**
+ * Manages the lifecycle of a db4o database instance (ObjectContainer).
+ * Provides methods to open and close such connection.
+ */
+
+public class DB4OManager implements DatabaseImplementation {
     public static ObjectContainer db4oContainer;
+
+    /**
+     * Opens a connection to the db4o database file.
+     * If it did not exist before, it will be created automatically.
+     *
+     * @throws DatabaseOpeningException if an error occurs while opening the database.
+     */
 
     @Override
     public void openDB() {
         try {
-            Db4oEmbedded.openFile(db4oDatabaseName);
+            db4oContainer = Db4oEmbedded.openFile(db4oDatabaseName);
             System.out.println("Opened database " + db4oDatabaseName + " successfully");
         } catch (Exception e) {
             throw new DatabaseOpeningException("Error opening database " + db4oDatabaseName, e);
         }
     }
+
+    /**
+     * Closes the connection to the db4o database.
+     * Ensures that all pending transactions are saved before closing.
+     *
+     * @throws DatabaseClosingException if an error occurs while closing the database.
+     */
 
     @Override
     public void closeDB() {

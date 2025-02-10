@@ -10,41 +10,55 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * Abstract class that provides generic CRUD operations for db4o. Meant to be extended and used together
+ * with implemented methods to query.
+ *
+ * @param <T> The type of entity being managed (Department, Employee).
+ */
+
 public abstract class BaseImplementation<T> {
+    private final Class<T> clazz; // Like this we know what kind of class are we
     private final Scanner scanner = new Scanner(System.in);
 
-    public BaseImplementation() {
-        if (DatabaseManager.db4oContainer == null) {
+    /**
+     * Constructs BaseImplementation and ensures that the database has been initialized.
+     *
+     * @param clazz The class type of the generic (T) entity.
+     * @throws RuntimeException If the database was not initialized.
+     */
+
+    public BaseImplementation(Class<T> clazz) {
+        if (DB4OManager.db4oContainer == null) {
             System.out.println("DatabaseManager not initialized");
             throw new RuntimeException("DatabaseManager not initialized");
         }
+        this.clazz = clazz;
     }
 
     /**
-     * Retrieves the class of the generic
+     * Checks if any given object exists in the db4o database.
      *
-     * @return The .class that is being implemented
+     * @param object Entity instance.
+     * @return {@code true} if exists, {@code false} otherwise.
      */
-    private Class<?> getClassType() {
-        // For testing purposes. Will remove later on
-        System.out.println("Class type: " + this.getClass().getName() + ", superclass:" + this.getClass().getSuperclass().getName());
-        return this.getClass().getSuperclass();
-    }
 
-    /**
-     * Checks if any given object is inside the db4o database already.
-     *
-     * @param object Instance of Employee or Department
-     * @return true if exists, false otherwise
-     */
     private boolean isObjectInDB(T object) {
-        return !(DatabaseManager.db4oContainer.queryByExample(object).isEmpty());
+        return !(DB4OManager.db4oContainer.queryByExample(object).isEmpty());
     }
+
+    /**
+     * Stores an object in the db4o database if it does not exist already.
+     *
+     * @param object The entity to be stored.
+     * @return {@code true} if the object was successfully stored, {@code false} if it exists.
+     * @throws DatabaseInsertException if an error occurs while storing the object.
+     */
 
     protected boolean storeObject(T object) {
         if (!isObjectInDB(object)) {
             try {
-                DatabaseManager.db4oContainer.store(object);
+                DB4OManager.db4oContainer.store(object);
                 return true;
             } catch (Exception e) {
                 throw new DatabaseInsertException("Could not store the object " + object.getClass().getName() + " in db4o", e);
@@ -52,6 +66,14 @@ public abstract class BaseImplementation<T> {
         }
         return false;
     }
+
+    /**
+     * Updates an object in the database based on user input.
+     *
+     * @param id               The unique identifier (Department_ID, Employee_ID) of the object.
+     * @param primaryFieldName The name of the primary key field (ID).
+     * @return An {@code Optional<T>} containing the updated object, or empty if it was not found.
+     */
 
     protected Optional<T> updateObject(Object id, String primaryFieldName) {
         Optional<T> objectOptional = getObject(id, primaryFieldName);
@@ -64,10 +86,11 @@ public abstract class BaseImplementation<T> {
         Optional<Field> fieldToUpdate = promptUserForFieldSelection(objectToUpdate);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
-        DatabaseManager.db4oContainer.commit();
+        DB4OManager.db4oContainer.commit();
         return modifyObjectField(objectToUpdate, fieldToUpdate.get());
     }
 
+    // Using Java Reflection, prints all the object fields and shows them to the user
     private Optional<Field> promptUserForFieldSelection(T object) {
         printObjectFields();
         int fieldIndex = scanner.nextInt();
@@ -77,21 +100,19 @@ public abstract class BaseImplementation<T> {
             System.out.println("Invalid field selection.");
             return Optional.empty();
         }
-
+        // +1 because index 0 start
         Field field = object.getClass().getDeclaredFields()[fieldIndex];
+        System.out.println("Field " + field.getName() + " selected.");
         field.setAccessible(true);
         return Optional.of(field);
     }
 
-    /**
-     * Uses Java Reflection to retrieve all the fields inside a class and prints them to the user.
-     */
     protected void printObjectFields() {
-        Field[] fields = this.getClass().getDeclaredFields();
-
+        Field[] fields = clazz.getDeclaredFields();
+        System.out.println("Select one of the available fields to modify:");
         for (int i = 0; i < fields.length; i++) {
             fields[i].setAccessible(true);
-            System.out.println((i + 1) + ". " + fields[i].getName());
+            System.out.println((i + ". " + fields[i].getName()));
         }
     }
 
@@ -99,14 +120,17 @@ public abstract class BaseImplementation<T> {
         return fieldIndex > object.getClass().getDeclaredFields().length - 1 || fieldIndex < 0;
     }
 
+    // Given the object to be updated, it asks the user for its new value and updates it. First it sets
+    // the field to the new value and then stores it in db4o.
     private Optional<T> modifyObjectField(T object, Field field) {
         try {
             System.out.println("Enter new value for: " + field.getName() + ": ");
+
             Object newValue;
 
             if (field.getType() == int.class) {
                 newValue = scanner.nextInt();
-                scanner.nextLine(); // Consumir buffer
+                scanner.nextLine();
             } else {
                 newValue = scanner.nextLine();
             }
@@ -121,14 +145,22 @@ public abstract class BaseImplementation<T> {
         return Optional.empty();
     }
 
+    /**
+     * Deletes an object from the db4o database.
+     *
+     * @param object The entity to be deleted.
+     * @return {@code true} if the object was successfully deleted, {@code false} otherwise.
+     * @throws DatabaseDeleteException if an error occurs while deleting the object.
+     */
+
     protected boolean deleteObject(T object) {
         if (isObjectInDB(object)) {
             try {
-                DatabaseManager.db4oContainer.delete(object);
-                DatabaseManager.db4oContainer.commit();
+                DB4OManager.db4oContainer.delete(object);
+                DB4OManager.db4oContainer.commit();
                 return true;
             } catch (Exception e) {
-                DatabaseManager.db4oContainer.rollback();
+                DB4OManager.db4oContainer.rollback();
                 throw new DatabaseDeleteException("Could not delete the object " + object.getClass().getName() + " in db4o", e);
             }
         }
@@ -136,17 +168,20 @@ public abstract class BaseImplementation<T> {
     }
 
     /**
-     * Retrieves an object from the DB given their ID and the field to query.
+     * Retrieves an object from the db4o database by its ID.
      *
-     * @param id             The unique ID of the object (Employee / Department ID).
-     * @param fieldQueryName The name of the field to query (PK field).
-     * @return Optional<T>. Returns an Optional of the object to query if it was found, else an empty Optional.
+     * @param id             The unique ID of the object (which would be Employee/Department ID).
+     * @param fieldQueryName The name of the field to query (PK).
+     * @return An {@code Optional<T>} containing the found object, or empty if it was not found.
+     * @throws DatabaseQueryException if an error occurs while querying the database.
      */
+
     protected Optional<T> getObject(Object id, String fieldQueryName) {
+        System.out.println("ID: " + id + " Query: " + fieldQueryName);
         try {
-            Query query = DatabaseManager.db4oContainer.query();
+            Query query = DB4OManager.db4oContainer.query();
             // Obtain the class (Employee or Department)
-            query.constrain(getClassType());
+            query.constrain(clazz);
             query.descend(fieldQueryName).constrain(id);
 
             List<T> queryResults = query.execute();
@@ -159,11 +194,18 @@ public abstract class BaseImplementation<T> {
 
     }
 
+    /**
+     * Retrieves all objects of the specified type from the db4o.
+     *
+     * @return A {@code List<T>} containing all objects of type T (determined by the constructor).
+     * @throws DatabaseQueryException if an error occurs while querying the database.
+     */
+
     protected List<T> getObjectList() {
         try {
-            Query query = DatabaseManager.db4oContainer.query();
-            query.constrain(getClassType());
-            return (List<T>) query.execute();
+            Query query = DB4OManager.db4oContainer.query();
+            query.constrain(clazz);
+            return query.execute();
         } catch (Exception e) {
             throw new DatabaseQueryException("Error querying all objects in db4o", e);
         }
