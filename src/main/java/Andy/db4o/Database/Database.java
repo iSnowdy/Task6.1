@@ -1,4 +1,6 @@
 package Andy.db4o.Database;
 
-public class Database {
+import DAO.Interfaces.EmployeeDAO;
+
+public class Database implements EmployeeDAO {
 }

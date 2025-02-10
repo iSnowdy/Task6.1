@@ -13,6 +13,16 @@ Aa
 8. Resolve conflicts.
 9. Merge.
 
+## Conditions
+
+- Nombres de variables y comentarios en inglés.
+- Una vez finalizado un método importante y testeado, documentarlo con JavaDoc (en inglés).
+- Nombres de variables y métodos descriptivos.
+- Mantener los métodos relativamente cortos (15-20 líneas máx).
+- Evitar devolver null siempre que sea posible.
+- Lanzar excepciones y capturarlas cuando toca (especialmente en lo relacionado a BBDD).
+- Evitar estructuras anidadas (3 if uno dentro del otro).
+
 ## Plain file (.txt)
 Aa
 
