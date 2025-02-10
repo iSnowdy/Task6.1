@@ -3,15 +3,15 @@ Aa
 
 ## Workflow
 
-1. Clone the rep.
-2. Checkout (if needed) to devmain.
-3. Clone devmain to a local branch.
-4. Work on the local branch.
-5. Merge the local branch to local devmain.
-6. Push devmain to GitHub.
-7. Pull Request devmain to main.
-8. Resolve conflicts.
-9. Merge.
+1. Accept contributor invitation.
+2. Move rep to local.
+3. Checkout to the branch created for you (has our names on them).
+4. Work on that branch locally.
+5. Push that branch.
+6. Create a Pull Request to merge with devmain.
+7. Revise the request. Feedback.
+8. Merge with devmain.
+9. Merge with main.
 
 ## Conditions
 
