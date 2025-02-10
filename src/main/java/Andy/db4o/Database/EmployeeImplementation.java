@@ -17,11 +17,9 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
 
     @Override
     public void addEmployee(Employee employee) {
-        try {
-            if (storeObject(employee)) {
-                System.out.println("Employee " + employee.getEmployeeID() + " successfully added");
-            }
-        } catch (DatabaseInsertException e) {
+        if (storeObject(employee)) {
+            System.out.println("Employee " + employee.getEmployeeID() + " successfully added");
+        } else {
             System.out.println("Employee " + employee.getEmployeeID() + " could not be added");
         }
     }
@@ -40,14 +38,9 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
             return false;
         }
 
-        try {
-            deleteObject(employeeOptional.get());
-            System.out.println("Employee " + id + " successfully deleted");
-            return true;
-        } catch (DatabaseDeleteException e) {
-            System.out.println("Employee " + id + " could not be deleted");
-        }
-        return false;
+        deleteObject(employeeOptional.get());
+        System.out.println("Employee " + id + " successfully deleted");
+        return true;
     }
 
     @Override

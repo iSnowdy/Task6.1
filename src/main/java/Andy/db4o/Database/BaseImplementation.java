@@ -2,6 +2,7 @@ package Andy.db4o.Database;
 
 import Excepciones.DatabaseDeleteException;
 import Excepciones.DatabaseInsertException;
+import Excepciones.DatabaseQueryException;
 import com.db4o.query.Query;
 
 import java.lang.reflect.Field;
@@ -46,7 +47,7 @@ public abstract class BaseImplementation<T> {
                 DatabaseManager.db4oContainer.store(object);
                 return true;
             } catch (Exception e) {
-                throw new DatabaseInsertException("Could not store object", e);
+                throw new DatabaseInsertException("Could not store the object " + object.getClass().getName() + " in db4o", e);
             }
         }
         return false;
@@ -63,6 +64,7 @@ public abstract class BaseImplementation<T> {
         Optional<Field> fieldToUpdate = promptUserForFieldSelection(objectToUpdate);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
+        DatabaseManager.db4oContainer.commit();
         return modifyObjectField(objectToUpdate, fieldToUpdate.get());
     }
 
@@ -127,7 +129,7 @@ public abstract class BaseImplementation<T> {
                 return true;
             } catch (Exception e) {
                 DatabaseManager.db4oContainer.rollback();
-                throw new DatabaseDeleteException("Could not delete object", e);
+                throw new DatabaseDeleteException("Could not delete the object " + object.getClass().getName() + " in db4o", e);
             }
         }
         return false;
@@ -141,20 +143,29 @@ public abstract class BaseImplementation<T> {
      * @return Optional<T>. Returns an Optional of the object to query if it was found, else an empty Optional.
      */
     protected Optional<T> getObject(Object id, String fieldQueryName) {
-        Query query = DatabaseManager.db4oContainer.query();
-        // Obtain the class (Employee or Department)
-        query.constrain(getClassType());
-        query.descend(fieldQueryName).constrain(id);
+        try {
+            Query query = DatabaseManager.db4oContainer.query();
+            // Obtain the class (Employee or Department)
+            query.constrain(getClassType());
+            query.descend(fieldQueryName).constrain(id);
 
-        List<T> queryResults = query.execute();
+            List<T> queryResults = query.execute();
 
-        // If the query result is empty, returns an empty Optional. Otherwise, the first match
-        return queryResults.isEmpty() ? Optional.empty() : Optional.of(queryResults.get(0));
+            // If the query result is empty, returns an empty Optional. Otherwise, the first match
+            return queryResults.isEmpty() ? Optional.empty() : Optional.of(queryResults.get(0));
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Error querying single object. Field: " + fieldQueryName + " in db4o", e);
+        }
+
     }
 
     protected List<T> getObjectList() {
-        Query query = DatabaseManager.db4oContainer.query();
-        query.constrain(getClassType());
-        return (List<T>) query.execute();
+        try {
+            Query query = DatabaseManager.db4oContainer.query();
+            query.constrain(getClassType());
+            return (List<T>) query.execute();
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Error querying all objects in db4o", e);
+        }
     }
 }
