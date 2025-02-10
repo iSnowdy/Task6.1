@@ -7,8 +7,10 @@ import com.db4o.query.Query;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 public abstract class BaseImplementation<T> {
+    private final Scanner scanner = new Scanner(System.in);
 
     public BaseImplementation() {
         if (DatabaseManager.db4oContainer == null) {
@@ -23,7 +25,60 @@ public abstract class BaseImplementation<T> {
      * @return The .class that is being implemented
      */
     private Class<?> getClassType() {
+        // For testing purposes. Will remove later on
+        System.out.println("Class type: " + this.getClass().getName() + ", superclass:" + this.getClass().getSuperclass().getName());
         return this.getClass().getSuperclass();
+    }
+
+    /**
+     * Checks if any given object is inside the db4o database already.
+     *
+     * @param object Instance of Employee or Department
+     * @return true if exists, false otherwise
+     */
+    private boolean isObjectInDB(T object) {
+        return !(DatabaseManager.db4oContainer.queryByExample(object).isEmpty());
+    }
+
+    protected boolean storeObject(T object) {
+        if (!isObjectInDB(object)) {
+            try {
+                DatabaseManager.db4oContainer.store(object);
+                return true;
+            } catch (Exception e) {
+                throw new DatabaseInsertException("Could not store object", e);
+            }
+        }
+        return false;
+    }
+
+    protected Optional<T> updateObject(Object id, String primaryFieldName) {
+        Optional<T> objectOptional = getObject(id, primaryFieldName);
+        if (objectOptional.isEmpty()) {
+            System.out.println("Object with ID " + id + " could not be found");
+            return Optional.empty();
+        }
+
+        T objectToUpdate = objectOptional.get();
+        Optional<Field> fieldToUpdate = promptUserForFieldSelection(objectToUpdate);
+        if (fieldToUpdate.isEmpty()) return Optional.empty();
+
+        return modifyObjectField(objectToUpdate, fieldToUpdate.get());
+    }
+
+    private Optional<Field> promptUserForFieldSelection(T object) {
+        printObjectFields();
+        int fieldIndex = scanner.nextInt();
+        scanner.nextLine(); // Consume buffer
+
+        if (isInvalidFieldIndex(fieldIndex, object)) {
+            System.out.println("Invalid field selection.");
+            return Optional.empty();
+        }
+
+        Field field = object.getClass().getDeclaredFields()[fieldIndex];
+        field.setAccessible(true);
+        return Optional.of(field);
     }
 
     /**
@@ -38,26 +93,30 @@ public abstract class BaseImplementation<T> {
         }
     }
 
-    /**
-     * Checks if any given object is inside the db4o database already.
-     *
-     * @param object Instance of Employee or Department
-     * @return true if exists, false otherwise
-     */
-    private boolean isObjectInDB(T object) {
-        return (DatabaseManager.db4oContainer.queryByExample(object).isEmpty());
+    private boolean isInvalidFieldIndex(int fieldIndex, T object) {
+        return fieldIndex > object.getClass().getDeclaredFields().length - 1 || fieldIndex < 0;
     }
 
-    protected boolean storeObject(T object) {
-        if (!isObjectInDB(object)) {
-            try {
-                DatabaseManager.db4oContainer.store(object);
-                return true;
-            } catch (Exception e) {
-                throw new DatabaseInsertException("Could not store object", e);
+    private Optional<T> modifyObjectField(T object, Field field) {
+        try {
+            System.out.println("Enter new value for: " + field.getName() + ": ");
+            Object newValue;
+
+            if (field.getType() == int.class) {
+                newValue = scanner.nextInt();
+                scanner.nextLine(); // Consumir buffer
+            } else {
+                newValue = scanner.nextLine();
             }
+
+            field.set(object, newValue);
+            storeObject(object);
+            System.out.println("Object successfully updated");
+            return Optional.of(object);
+        } catch (IllegalAccessException | DatabaseInsertException exception) {
+            System.out.println("Object could not be updated: " + exception.getMessage());
         }
-        return false;
+        return Optional.empty();
     }
 
     protected boolean deleteObject(T object) {
@@ -87,12 +146,10 @@ public abstract class BaseImplementation<T> {
         query.constrain(getClassType());
         query.descend(fieldQueryName).constrain(id);
 
-        Object queryResult = query.execute();
+        List<T> queryResults = query.execute();
 
-        if (queryResult != null) {
-            return Optional.of((T) queryResult);
-        }
-        return Optional.empty();
+        // If the query result is empty, returns an empty Optional. Otherwise, the first match
+        return queryResults.isEmpty() ? Optional.empty() : Optional.of(queryResults.get(0));
     }
 
     protected List<T> getObjectList() {

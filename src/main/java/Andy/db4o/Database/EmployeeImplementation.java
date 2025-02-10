@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class EmployeeImplementation extends BaseImplementation<Employee> implements EmployeeDAO {
     // Java Reflection to extract the name of the PK field
-    private final String primaryFieldName = Employee.class.getFields()[0].getName();
+    private final String primaryFieldName = Employee.class.getDeclaredFields()[0].getName();
 
 
     @Override
@@ -28,7 +28,7 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
 
     @Override
     public Optional<Employee> updateEmployee(Object id) {
-        return null;
+        return updateObject(id, primaryFieldName);
     }
 
     @Override
@@ -55,6 +55,7 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
         Optional<Employee> employeeOptional = getObject(id, primaryFieldName);
         if (employeeOptional.isEmpty()) {
             System.out.println("Employee " + id + " could not be found");
+            return Optional.empty();
         }
         System.out.println("Employee " + id + " found");
         return employeeOptional;

@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class DepartmentImplementation extends BaseImplementation<Department> implements DepartmentDAO {
     // Java Reflection to extract the name of the PK field
-    private final String primaryFieldName = Department.class.getFields()[0].getName();
+    private final String primaryFieldName = Department.class.getDeclaredFields()[0].getName();
     private Scanner scanner = new Scanner(System.in);
 
 
@@ -32,43 +32,15 @@ public class DepartmentImplementation extends BaseImplementation<Department> imp
 
     @Override
     public Optional<Department> updateDepartment(Object id) {
-        Optional<Department> department = getObject(id, primaryFieldName);
-
-        if (department.isEmpty()) {
-            System.out.println("Department " + department.get().getDepartmentID() + " could not be found");
-            return Optional.empty();
-        }
-
-        Optional<Field> fieldToUpdate = getFieldToUpdateFromUser();
-        if (fieldToUpdate.isEmpty()) {
-            System.out.println("The specified field does not exist");
-        }
-
-
-
-
-
+        return updateObject(id, primaryFieldName);
     }
-
-    private Optional<Field> getFieldToUpdateFromUser() {
-        printObjectFields();
-        int fieldIndex = scanner.nextInt();
-        if (!isInvalidFieldIndex(fieldIndex)) {
-            Department.class.getDeclaredFields()[fieldIndex].setAccessible(true);
-        }
-        return Optional.empty();
-    }
-
-    private boolean isInvalidFieldIndex(int fieldIndex) {
-        return fieldIndex > Department.class.getFields().length - 1 || fieldIndex < 0;
-    }
-
 
     @Override
     public Optional<Department> deleteDepartment(Object id) {
         Optional<Department> departmentOptional = getObject(id, primaryFieldName);
         if (departmentOptional.isEmpty()) {
             System.out.println("Department " + id + " not found");
+            return Optional.empty();
         }
 
         try {
