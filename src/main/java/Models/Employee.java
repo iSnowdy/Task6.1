@@ -1,16 +1,23 @@
 package Models;
 
-import Models.Enum.EmployeePosition;
 
 public class Employee {
     private int employeeID; // FK auto-generated
     private String employeeName;
-    private EmployeePosition employeePosition;
+    private String employeePosition;
 
     private int departmentID;
     private Department department; // FK references Department
 
-    public Employee(String employeeName, EmployeePosition employeePosition, int departmentID, Department department) {
+    public Employee(String employeeName, String employeePosition, int departmentID, Department department) {
+        this.employeeName = employeeName;
+        this.employeePosition = employeePosition;
+        this.departmentID = departmentID;
+        this.department = department;
+    }
+
+    public Employee(int employeeID, String employeeName, String employeePosition, int departmentID, Department department) {
+        this.employeeID = employeeID;
         this.employeeName = employeeName;
         this.employeePosition = employeePosition;
         this.departmentID = departmentID;
@@ -36,7 +43,7 @@ public class Employee {
                 "-----------------------\n" +
                 "Employee ID: " + employeeID + "\n" +
                 "Employee Name: " + employeeName + "\n" +
-                "Employee Position: " + employeePosition.getEmployeePositionAsString() + "\n" +
+                "Employee Position: " + employeePosition + "\n" +
                 "Department ID: " + departmentID;
     }
 
@@ -56,10 +63,10 @@ public class Employee {
         this.employeeName = employeeName;
     }
 
-    public EmployeePosition getEmployeePosition() {
+    public String getEmployeePosition() {
         return employeePosition;
     }
-    public void setEmployeePosition(EmployeePosition employeePosition) {
+    public void setEmployeePosition(String employeePosition) {
         this.employeePosition = employeePosition;
     }
 

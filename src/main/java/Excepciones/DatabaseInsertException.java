@@ -1,6 +1,10 @@
 package Excepciones;
 
-public class DatabaseInsertException extends RuntimeException {
+public class DatabaseInsertException extends DatabaseException {
+    public DatabaseInsertException(String message) {
+        super(message);
+    }
+
     public DatabaseInsertException(String message, Throwable cause) {
         super(message, cause);
     }
