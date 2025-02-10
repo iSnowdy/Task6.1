@@ -1,5 +1,7 @@
 package DAO.Interfaces;
 
+import Models.Employee;
+
 import java.util.List;
 
 /**
@@ -7,9 +9,9 @@ import java.util.List;
  */
 
 public interface EmployeeDAO {
-    public void addEmployee(Object employee);
-    public Object updateEmployee(Object id);
+    public void addEmployee(Employee employee);
+    public Employee updateEmployee(Object id);
     public boolean deleteEmployee(Object id);
-    public Object findEmployeeByID(Object id);
-    public List<Object> findAllEmployees();
+    public Employee findEmployeeByID(Object id);
+    public List<Employee> findAllEmployees();
 }

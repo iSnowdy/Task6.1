@@ -1,6 +1,8 @@
 package DAO.Interfaces;
 
 public interface DatabaseImplementation {
-    boolean openDB();
-    boolean closeDB();
+    String db4oDatabaseName = "Company_DB4O.db4o";
+
+    void openDB();
+    void closeDB();
 }
