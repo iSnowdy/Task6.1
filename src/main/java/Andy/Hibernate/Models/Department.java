@@ -11,16 +11,36 @@ public class Department {
     @Id
     @Column(name = "depno", nullable = false)
     private Integer id;
-
     @Column(name = "nombre", length = 14)
-    private String Department_Name;
-
+    private String departmentName;
     @Column(name = "ubicacion", length = 13)
-    private String Department_Address;
-
+    private String departmentAddress;
     @OneToMany
     private Set<Andy.Hibernate.Models.Employee> EmployeesList = new LinkedHashSet<>();
 
+    public Department() {}
+
+    public Department(final int departmentID, String departmentName, String departmentAddress) {
+        this.id = departmentID;
+        this.departmentName = departmentName;
+        this.departmentAddress = departmentAddress;
+    }
+
+
+    @Override
+    public String toString() {
+        return
+                "-----------------------\n" +
+                "Department Information\n" +
+                "-----------------------\n" +
+                "Department ID: " + id + "\n" +
+                "Department Name: " + departmentName + "\n" +
+                "Department Address: " + departmentAddress + "\n" +
+                "-----------------------\n";
+    }
+
+
+    // Getters and Setters
     public Integer getId() {
         return id;
     }
@@ -28,18 +48,18 @@ public class Department {
         this.id = id;
     }
 
-    public String getDepartment_Name() {
-        return Department_Name;
+    public String getDepartmentName() {
+        return departmentName;
     }
-    public void setDepartment_Name(String Department_Name) {
-        this.Department_Name = Department_Name;
+    public void setDepartmentName(String Department_Name) {
+        this.departmentName = Department_Name;
     }
 
-    public String getDepartment_Address() {
-        return Department_Address;
+    public String getDepartmentAddress() {
+        return departmentAddress;
     }
-    public void setDepartment_Address(String Department_Address) {
-        this.Department_Address = Department_Address;
+    public void setDepartmentAddress(String Department_Address) {
+        this.departmentAddress = Department_Address;
     }
 
     public Set<Andy.Hibernate.Models.Employee> getEmployeesList() {

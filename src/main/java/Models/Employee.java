@@ -44,7 +44,8 @@ public class Employee {
                 "Employee ID: " + employeeID + "\n" +
                 "Employee Name: " + employeeName + "\n" +
                 "Employee Position: " + employeePosition + "\n" +
-                "Department ID: " + departmentID;
+                "Department ID: " + departmentID + "\n" +
+                "-----------------------\n";
     }
 
 

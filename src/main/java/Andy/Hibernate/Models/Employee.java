@@ -10,17 +10,39 @@ public class Employee {
     @SequenceGenerator(name = "empleado_id_gen", sequenceName = "empleado_empno_seq", allocationSize = 1)
     @Column(name = "empno", nullable = false)
     private Integer id;
-
     @Column(name = "nombre", length = 10)
-    private String Employee_Name;
-
+    private String employeeName;
     @Column(name = "puesto", length = 15)
-    private String Employee_Job;
-
+    private String employeeJob;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depno")
-    private Department Department_ID;
+    private Department department;
 
+    public Employee() {}
+
+    // Employee ID is auto generated. We should not need to pass it as a parameter to the constructor
+    public Employee(String departmentName, String departmentAddress, Department department) {
+        this.employeeName = departmentName;
+        this.employeeJob = departmentAddress;
+        this.department = department;
+    }
+
+
+    @Override
+    public String toString() {
+        return
+                "-----------------------\n" +
+                "Employee Information\n" +
+                "-----------------------\n" +
+                "Employee ID: " + id + "\n" +
+                "Employee Name: " + employeeName + "\n" +
+                "Employee Position: " + employeeJob + "\n" +
+                "Department ID: " + department.getId() + "\n" +
+                "-----------------------\n";
+    }
+
+
+    // Getters and Setters
     public Integer getId() {
         return id;
     }
@@ -28,24 +50,24 @@ public class Employee {
         this.id = id;
     }
 
-    public String getEmployee_Name() {
-        return Employee_Name;
+    public String getEmployeeName() {
+        return employeeName;
     }
-    public void setEmployee_Name(String Employee_Name) {
-        this.Employee_Name = Employee_Name;
-    }
-
-    public String getEmployee_Job() {
-        return Employee_Job;
-    }
-    public void setEmployee_Job(String Employee_Job) {
-        this.Employee_Job = Employee_Job;
+    public void setEmployeeName(String Employee_Name) {
+        this.employeeName = Employee_Name;
     }
 
-    public Department getDepartment_ID() {
-        return Department_ID;
+    public String getEmployeeJob() {
+        return employeeJob;
     }
-    public void setDepartment_ID(Department Department_ID) {
-        this.Department_ID = Department_ID;
+    public void setEmployeeJob(String Employee_Job) {
+        this.employeeJob = Employee_Job;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+    public void setDepartment(Department Department_ID) {
+        this.department = Department_ID;
     }
 }
