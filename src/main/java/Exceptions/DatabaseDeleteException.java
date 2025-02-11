@@ -1,4 +1,4 @@
-package Excepciones;
+package Exceptions;
 
 public class DatabaseDeleteException extends DatabaseException {
     public DatabaseDeleteException(String message) {

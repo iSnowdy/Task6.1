@@ -1,8 +1,8 @@
 package Andy.db4o.Database;
 
 import DAO.Interfaces.DatabaseImplementation;
-import Excepciones.DatabaseClosingException;
-import Excepciones.DatabaseOpeningException;
+import Exceptions.DatabaseClosingException;
+import Exceptions.DatabaseOpeningException;
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
 

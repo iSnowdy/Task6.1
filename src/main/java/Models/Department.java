@@ -31,8 +31,10 @@ public class Department {
                 "-----------------------\n" +
                 "Department ID: " + departmentID + "\n" +
                 "Department Name: " + departmentName + "\n" +
-                "Department Address: " + departmentAddress + "\n";
+                "Department Address: " + departmentAddress + "\n" +
+                "-----------------------\n";
     }
+
 
     // Getters and Setters
     public int getDepartmentID() {

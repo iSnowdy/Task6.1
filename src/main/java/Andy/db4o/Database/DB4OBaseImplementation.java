@@ -1,8 +1,8 @@
 package Andy.db4o.Database;
 
-import Excepciones.DatabaseDeleteException;
-import Excepciones.DatabaseInsertException;
-import Excepciones.DatabaseQueryException;
+import Exceptions.DatabaseDeleteException;
+import Exceptions.DatabaseInsertException;
+import Exceptions.DatabaseQueryException;
 import com.db4o.query.Query;
 
 import java.lang.reflect.Field;
@@ -17,7 +17,7 @@ import java.util.Scanner;
  * @param <T> The type of entity being managed (Department, Employee).
  */
 
-public abstract class BaseImplementation<T> {
+public abstract class DB4OBaseImplementation<T> {
     private final Class<T> clazz; // Like this we know what kind of class are we
     private final Scanner scanner = new Scanner(System.in);
 
@@ -28,7 +28,7 @@ public abstract class BaseImplementation<T> {
      * @throws RuntimeException If the database was not initialized.
      */
 
-    public BaseImplementation(Class<T> clazz) {
+    public DB4OBaseImplementation(Class<T> clazz) {
         if (DB4OManager.db4oContainer == null) {
             System.out.println("DatabaseManager not initialized");
             throw new RuntimeException("DatabaseManager not initialized");
@@ -75,6 +75,8 @@ public abstract class BaseImplementation<T> {
      * @return An {@code Optional<T>} containing the updated object, or empty if it was not found.
      */
 
+    // TODO: Preguntar a Pascual cómo quiere que implementemos el update. Si la lógica de preguntar por input
+    //       está bien que la tenga aquí o debería ir separada
     protected Optional<T> updateObject(Object id, String primaryFieldName) {
         Optional<T> objectOptional = getObject(id, primaryFieldName);
         if (objectOptional.isEmpty()) {
@@ -86,7 +88,6 @@ public abstract class BaseImplementation<T> {
         Optional<Field> fieldToUpdate = promptUserForFieldSelection(objectToUpdate);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
-        DB4OManager.db4oContainer.commit();
         return modifyObjectField(objectToUpdate, fieldToUpdate.get());
     }
 
@@ -137,12 +138,13 @@ public abstract class BaseImplementation<T> {
 
             field.set(object, newValue);
             storeObject(object);
+            DB4OManager.db4oContainer.commit();
             System.out.println("Object successfully updated");
-            return Optional.of(object);
-        } catch (IllegalAccessException | DatabaseInsertException exception) {
-            System.out.println("Object could not be updated: " + exception.getMessage());
+            return Optional.ofNullable(object);
+        } catch (Exception e) {
+            System.out.println("Object could not be updated");
+            throw new DatabaseQueryException("Object could not be updated in db4o", e);
         }
-        return Optional.empty();
     }
 
     /**
@@ -187,11 +189,10 @@ public abstract class BaseImplementation<T> {
             List<T> queryResults = query.execute();
 
             // If the query result is empty, returns an empty Optional. Otherwise, the first match
-            return queryResults.isEmpty() ? Optional.empty() : Optional.of(queryResults.get(0));
+            return queryResults.isEmpty() ? Optional.empty() : Optional.ofNullable(queryResults.getFirst());
         } catch (Exception e) {
             throw new DatabaseQueryException("Error querying single object. Field: " + fieldQueryName + " in db4o", e);
         }
-
     }
 
     /**

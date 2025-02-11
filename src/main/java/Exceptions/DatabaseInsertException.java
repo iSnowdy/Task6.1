@@ -1,4 +1,4 @@
-package Excepciones;
+package Exceptions;
 
 public class DatabaseInsertException extends DatabaseException {
     public DatabaseInsertException(String message) {

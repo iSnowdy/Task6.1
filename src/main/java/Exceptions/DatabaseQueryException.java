@@ -1,4 +1,4 @@
-package Excepciones;
+package Exceptions;
 
 public class DatabaseQueryException extends DatabaseException {
     public DatabaseQueryException(String message) {

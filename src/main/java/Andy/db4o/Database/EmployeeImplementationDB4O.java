@@ -1,8 +1,8 @@
 package Andy.db4o.Database;
 
 import DAO.Interfaces.EmployeeDAO;
-import Excepciones.DatabaseDeleteException;
-import Excepciones.DatabaseInsertException;
+import Exceptions.DatabaseDeleteException;
+import Exceptions.DatabaseInsertException;
 import Models.Employee;
 
 import java.util.List;
@@ -13,16 +13,16 @@ import java.util.Optional;
  * Provides CRUD operations for managing {@link Employee} entities in the db4o database.
  */
 
-public class EmployeeImplementation extends BaseImplementation<Employee> implements EmployeeDAO {
+public class EmployeeImplementationDB4O extends DB4OBaseImplementation<Employee> implements EmployeeDAO {
     // Java Reflection to extract the name of the PK field
     private final String primaryFieldName = Employee.class.getDeclaredFields()[0].getName();
 
     /**
      * Constructs an EmployeeImplementation instance while specifying the class type for the db4o operations
-     * inside {@link BaseImplementation}.
+     * inside {@link DB4OBaseImplementation}.
      */
 
-    public EmployeeImplementation() {
+    public EmployeeImplementationDB4O() {
         super(Employee.class);
     }
 
@@ -46,7 +46,7 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
      *
      * @param id The unique identifier (ID, PK) of the employee to be updated.
      * @return An {@code Optional<Employee>} containing the updated employee, or empty if not found.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the update.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the update.
      */
 
     @Override
@@ -64,11 +64,7 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
 
     @Override
     public boolean deleteEmployee(Object id) {
-        System.out.println("Inside deleteEmployee method");
-        System.out.println("Deleting Employee " + id);
         Optional<Employee> employeeOptional = getObject(id, primaryFieldName);
-
-        System.out.println("Is present? " + employeeOptional.isPresent());
 
         if (employeeOptional.isEmpty()) {
             System.out.println("Employee " + id + " could not be found");
@@ -85,7 +81,7 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
      *
      * @param id The unique identifier of the employee.
      * @return An {@code Optional<Employee>} containing the found employee, or empty if not found.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the querying process.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the querying process.
      */
 
     @Override
@@ -103,7 +99,7 @@ public class EmployeeImplementation extends BaseImplementation<Employee> impleme
      * Retrieves all employees stored in the database.
      *
      * @return A {@code List<Employee>} containing all the employees in the database.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the querying process.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the querying process.
      */
 
     @Override

@@ -1,4 +1,4 @@
-package Excepciones;
+package Exceptions;
 
 /**
  * This will encapsulate the rest of specific exceptions.

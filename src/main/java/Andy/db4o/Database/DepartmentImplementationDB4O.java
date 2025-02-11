@@ -1,8 +1,8 @@
 package Andy.db4o.Database;
 
 import DAO.Interfaces.DepartmentDAO;
-import Excepciones.DatabaseDeleteException;
-import Excepciones.DatabaseInsertException;
+import Exceptions.DatabaseDeleteException;
+import Exceptions.DatabaseInsertException;
 import Models.Department;
 
 import java.util.List;
@@ -13,16 +13,16 @@ import java.util.Optional;
  * Provides CRUD operations for managing {@link Department} entities inside the db4o database.
  */
 
-public class DepartmentImplementation extends BaseImplementation<Department> implements DepartmentDAO {
+public class DepartmentImplementationDB4O extends DB4OBaseImplementation<Department> implements DepartmentDAO {
     // Java Reflection to extract the name of the PK field
     private final String primaryFieldName = Department.class.getDeclaredFields()[0].getName();
 
     /**
      * Constructs a DepartmentImplementation instance while specifying the class type for the db4o operations
-     * inside {@link BaseImplementation}.
+     * inside {@link DB4OBaseImplementation}.
      */
 
-    public DepartmentImplementation() {
+    public DepartmentImplementationDB4O() {
         super(Department.class);
     }
 
@@ -52,7 +52,7 @@ public class DepartmentImplementation extends BaseImplementation<Department> imp
      *
      * @param id The unique identifier of the department to update.
      * @return An {@code Optional<Department>} containing the updated department, or empty if it was not found.
-     * @throws Excepciones.DatabaseQueryException if an error occurs while updating the department.
+     * @throws Exceptions.DatabaseQueryException if an error occurs while updating the department.
      */
 
     @Override
@@ -85,7 +85,7 @@ public class DepartmentImplementation extends BaseImplementation<Department> imp
      *
      * @param id The unique identifier of the department.
      * @return An {@code Optional<Department>} containing the found department, or empty if it was not found.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the querying process.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the querying process.
      */
 
     @Override
@@ -102,7 +102,7 @@ public class DepartmentImplementation extends BaseImplementation<Department> imp
      * Retrieves all departments stored in the database.
      *
      * @return A {@code List<Department} containing all the departments in the database.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the querying process.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the querying process.
      */
 
     @Override
