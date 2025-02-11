@@ -12,7 +12,7 @@
         <!-- DB schema will be updated if needed -->
         <property name="hibernate.hbm2ddl.auto">update</property>
 
-        <mapping class="Andy.Hibernate.Models.Department"/>
-        <mapping class="Andy.Hibernate.Models.Employee"/>
+        <mapping class="Andy.Hibernate.Models.HDepartment"/>
+        <mapping class="Andy.Hibernate.Models.HEmployee"/>
     </session-factory>
 </hibernate-configuration>

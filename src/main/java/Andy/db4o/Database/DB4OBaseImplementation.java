@@ -17,7 +17,7 @@ import java.util.Scanner;
  * @param <T> The type of entity being managed (Department, Employee).
  */
 
-public abstract class BaseImplementation<T> {
+public abstract class DB4OBaseImplementation<T> {
     private final Class<T> clazz; // Like this we know what kind of class are we
     private final Scanner scanner = new Scanner(System.in);
 
@@ -28,7 +28,7 @@ public abstract class BaseImplementation<T> {
      * @throws RuntimeException If the database was not initialized.
      */
 
-    public BaseImplementation(Class<T> clazz) {
+    public DB4OBaseImplementation(Class<T> clazz) {
         if (DB4OManager.db4oContainer == null) {
             System.out.println("DatabaseManager not initialized");
             throw new RuntimeException("DatabaseManager not initialized");
@@ -88,7 +88,6 @@ public abstract class BaseImplementation<T> {
         Optional<Field> fieldToUpdate = promptUserForFieldSelection(objectToUpdate);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
-        DB4OManager.db4oContainer.commit();
         return modifyObjectField(objectToUpdate, fieldToUpdate.get());
     }
 
@@ -139,12 +138,13 @@ public abstract class BaseImplementation<T> {
 
             field.set(object, newValue);
             storeObject(object);
+            DB4OManager.db4oContainer.commit();
             System.out.println("Object successfully updated");
             return Optional.of(object);
-        } catch (IllegalAccessException | DatabaseInsertException exception) {
-            System.out.println("Object could not be updated: " + exception.getMessage());
+        } catch (Exception e) {
+            System.out.println("Object could not be updated");
+            throw new DatabaseQueryException("Object could not be updated in db4o", e);
         }
-        return Optional.empty();
     }
 
     /**

@@ -1,8 +1,8 @@
 package Andy.Tests;
 
 import Andy.db4o.Database.DB4OManager;
-import Andy.db4o.Database.DepartmentImplementation;
-import Andy.db4o.Database.EmployeeImplementation;
+import Andy.db4o.Database.DepartmentImplementationDB4O;
+import Andy.db4o.Database.EmployeeImplementationDB4O;
 import Excepciones.DatabaseClosingException;
 import Excepciones.DatabaseOpeningException;
 import Excepciones.DatabaseDeleteException;
@@ -17,8 +17,8 @@ import java.util.List;
 
 public class MainDB4O {
     private static DB4OManager db4oManager;
-    private static DepartmentImplementation departmentDAO;
-    private static EmployeeImplementation employeeDAO;
+    private static DepartmentImplementationDB4O departmentDAO;
+    private static EmployeeImplementationDB4O employeeDAO;
 
     public static void main(String[] args) {
         System.out.println("Testing mainDB4O...");
@@ -27,8 +27,8 @@ public class MainDB4O {
 
         openDatabase();
 
-        departmentDAO = new DepartmentImplementation();
-        employeeDAO = new EmployeeImplementation();
+        departmentDAO = new DepartmentImplementationDB4O();
+        employeeDAO = new EmployeeImplementationDB4O();
 
         insertData();
         queryData();

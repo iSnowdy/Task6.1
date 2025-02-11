@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "empleado")
-public class Employee implements DatabaseEntity {
+public class HEmployee implements DatabaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "empleado_id_gen")
     @SequenceGenerator(name = "empleado_id_gen", sequenceName = "empleado_empno_seq", allocationSize = 1)
@@ -16,15 +16,15 @@ public class Employee implements DatabaseEntity {
     private String employeeJob;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depno")
-    private Department department;
+    private HDepartment HDepartment;
 
-    public Employee() {}
+    public HEmployee() {}
 
     // Employee ID is auto generated. We should not need to pass it as a parameter to the constructor
-    public Employee(String departmentName, String departmentAddress, Department department) {
+    public HEmployee(String departmentName, String departmentAddress, HDepartment HDepartment) {
         this.employeeName = departmentName;
         this.employeeJob = departmentAddress;
-        this.department = department;
+        this.HDepartment = HDepartment;
     }
 
 
@@ -37,7 +37,7 @@ public class Employee implements DatabaseEntity {
                 "Employee ID: " + id + "\n" +
                 "Employee Name: " + employeeName + "\n" +
                 "Employee Position: " + employeeJob + "\n" +
-                "Department ID: " + department.getId() + "\n" +
+                "Department ID: " + HDepartment.getId() + "\n" +
                 "-----------------------\n";
     }
 
@@ -69,10 +69,10 @@ public class Employee implements DatabaseEntity {
         this.employeeJob = Employee_Job;
     }
 
-    public Department getDepartment() {
-        return department;
+    public HDepartment getDepartment() {
+        return HDepartment;
     }
-    public void setDepartment(Department Department_ID) {
-        this.department = Department_ID;
+    public void setDepartment(HDepartment HDepartment_ID) {
+        this.HDepartment = HDepartment_ID;
     }
 }
