@@ -1,8 +1,8 @@
 package Andy.db4o.Database;
 
-import Excepciones.DatabaseDeleteException;
-import Excepciones.DatabaseInsertException;
-import Excepciones.DatabaseQueryException;
+import Exceptions.DatabaseDeleteException;
+import Exceptions.DatabaseInsertException;
+import Exceptions.DatabaseQueryException;
 import com.db4o.query.Query;
 
 import java.lang.reflect.Field;
@@ -140,7 +140,7 @@ public abstract class DB4OBaseImplementation<T> {
             storeObject(object);
             DB4OManager.db4oContainer.commit();
             System.out.println("Object successfully updated");
-            return Optional.of(object);
+            return Optional.ofNullable(object);
         } catch (Exception e) {
             System.out.println("Object could not be updated");
             throw new DatabaseQueryException("Object could not be updated in db4o", e);
@@ -189,11 +189,10 @@ public abstract class DB4OBaseImplementation<T> {
             List<T> queryResults = query.execute();
 
             // If the query result is empty, returns an empty Optional. Otherwise, the first match
-            return queryResults.isEmpty() ? Optional.empty() : Optional.of(queryResults.get(0));
+            return queryResults.isEmpty() ? Optional.empty() : Optional.ofNullable(queryResults.getFirst());
         } catch (Exception e) {
             throw new DatabaseQueryException("Error querying single object. Field: " + fieldQueryName + " in db4o", e);
         }
-
     }
 
     /**

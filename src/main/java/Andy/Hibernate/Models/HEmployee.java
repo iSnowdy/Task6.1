@@ -42,7 +42,7 @@ public class HEmployee implements DatabaseEntity {
     }
 
     @Override
-    public int getID() {
+    public Integer getID() {
         return id;
     }
 

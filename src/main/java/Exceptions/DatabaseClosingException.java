@@ -1,4 +1,4 @@
-package Excepciones;
+package Exceptions;
 
 public class DatabaseClosingException extends DatabaseException {
     public DatabaseClosingException(String message) {

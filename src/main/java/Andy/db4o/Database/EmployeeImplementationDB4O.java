@@ -1,8 +1,8 @@
 package Andy.db4o.Database;
 
 import DAO.Interfaces.EmployeeDAO;
-import Excepciones.DatabaseDeleteException;
-import Excepciones.DatabaseInsertException;
+import Exceptions.DatabaseDeleteException;
+import Exceptions.DatabaseInsertException;
 import Models.Employee;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class EmployeeImplementationDB4O extends DB4OBaseImplementation<Employee>
      *
      * @param id The unique identifier (ID, PK) of the employee to be updated.
      * @return An {@code Optional<Employee>} containing the updated employee, or empty if not found.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the update.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the update.
      */
 
     @Override
@@ -81,7 +81,7 @@ public class EmployeeImplementationDB4O extends DB4OBaseImplementation<Employee>
      *
      * @param id The unique identifier of the employee.
      * @return An {@code Optional<Employee>} containing the found employee, or empty if not found.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the querying process.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the querying process.
      */
 
     @Override
@@ -99,7 +99,7 @@ public class EmployeeImplementationDB4O extends DB4OBaseImplementation<Employee>
      * Retrieves all employees stored in the database.
      *
      * @return A {@code List<Employee>} containing all the employees in the database.
-     * @throws Excepciones.DatabaseQueryException if an error occurs during the querying process.
+     * @throws Exceptions.DatabaseQueryException if an error occurs during the querying process.
      */
 
     @Override

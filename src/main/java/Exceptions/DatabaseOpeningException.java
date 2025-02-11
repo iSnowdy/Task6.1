@@ -1,4 +1,4 @@
-package Excepciones;
+package Exceptions;
 
 public class DatabaseOpeningException extends DatabaseException {
     public DatabaseOpeningException(String message) {

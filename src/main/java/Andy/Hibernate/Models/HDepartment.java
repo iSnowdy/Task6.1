@@ -40,7 +40,7 @@ public class HDepartment implements DatabaseEntity {
     }
 
     @Override
-    public int getID() {
+    public Integer getID() {
         return id;
     }
 
