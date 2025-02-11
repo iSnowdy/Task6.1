@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "empleado")
-public class Employee {
+public class Employee implements DatabaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "empleado_id_gen")
     @SequenceGenerator(name = "empleado_id_gen", sequenceName = "empleado_empno_seq", allocationSize = 1)
@@ -39,6 +39,11 @@ public class Employee {
                 "Employee Position: " + employeeJob + "\n" +
                 "Department ID: " + department.getId() + "\n" +
                 "-----------------------\n";
+    }
+
+    @Override
+    public int getID() {
+        return id;
     }
 
 

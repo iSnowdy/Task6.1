@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "departamento")
-public class Department {
+public class Department implements DatabaseEntity {
     @Id
     @Column(name = "depno", nullable = false)
     private Integer id;
@@ -37,6 +37,11 @@ public class Department {
                 "Department Name: " + departmentName + "\n" +
                 "Department Address: " + departmentAddress + "\n" +
                 "-----------------------\n";
+    }
+
+    @Override
+    public int getID() {
+        return id;
     }
 
 

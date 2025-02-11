@@ -75,6 +75,8 @@ public abstract class BaseImplementation<T> {
      * @return An {@code Optional<T>} containing the updated object, or empty if it was not found.
      */
 
+    // TODO: Preguntar a Pascual cómo quiere que implementemos el update. Si la lógica de preguntar por input
+    //       está bien que la tenga aquí o debería ir separada
     protected Optional<T> updateObject(Object id, String primaryFieldName) {
         Optional<T> objectOptional = getObject(id, primaryFieldName);
         if (objectOptional.isEmpty()) {
