@@ -10,9 +10,9 @@ import java.util.Optional;
  */
 
 public interface EmployeeDAO {
-    public void addEmployee(Employee employee);
-    public Optional<Employee> updateEmployee(Object id);
-    public boolean deleteEmployee(Object id);
-    public Optional<Employee> findEmployeeByID(Object id);
-    public List<Employee> findAllEmployees();
+    void addEmployee(Employee employee);
+    Optional<Employee> updateEmployee(Object id);
+    boolean deleteEmployee(Object id);
+    Optional<Employee> findEmployeeByID(Object id);
+    List<Employee> findAllEmployees();
 }
