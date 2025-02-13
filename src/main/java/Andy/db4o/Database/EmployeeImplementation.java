@@ -13,7 +13,7 @@ import java.util.Optional;
  * Provides CRUD operations for managing {@link Employee} entities in the db4o database.
  */
 
-public class EmployeeImplementationDB4O extends DB4OBaseImplementation<Employee> implements EmployeeDAO {
+public class EmployeeImplementation extends DB4OBaseImplementation<Employee> implements EmployeeDAO {
     // Java Reflection to extract the name of the PK field
     private final String primaryFieldName = Employee.class.getDeclaredFields()[0].getName();
 
@@ -22,7 +22,7 @@ public class EmployeeImplementationDB4O extends DB4OBaseImplementation<Employee>
      * inside {@link DB4OBaseImplementation}.
      */
 
-    public EmployeeImplementationDB4O() {
+    public EmployeeImplementation() {
         super(Employee.class);
     }
 

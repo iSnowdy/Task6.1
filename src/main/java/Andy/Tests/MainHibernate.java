@@ -1,8 +1,8 @@
 package Andy.Tests;
 
-import Andy.Hibernate.Database.DepartmentImplementationHibernate;
-import Andy.Hibernate.Database.EmployeeImplementationHibernate;
-import Andy.Hibernate.Database.Util.HibernateManager;
+import Andy.Hibernate.Database.DepartmentImplementation;
+import Andy.Hibernate.Database.EmployeeImplementation;
+import Andy.Hibernate.Database.Util.DatabaseManager;
 import Andy.Hibernate.Models.HDepartment;
 import Andy.Hibernate.Models.HEmployee;
 import Exceptions.DatabaseDeleteException;
@@ -12,41 +12,19 @@ import Exceptions.DatabaseQueryException;
 import Models.Enum.DepartmentNames;
 import Models.Enum.EmployeePosition;
 
-/*
-Optional<T>
-It is a safe way of returning an object without verification if it is null or not, making
-the code more legible and secure, as it does not throw NullPointerExceptions either.
-
-There are 3 ways of creating an optional:
-    1. Optional.of() Does not allow for null, so it does throw NullPointerException. So we
-    must make sure the value inside is not null.
-    2. Optional.empty() Simply returns and empty Optional.
-    3. Optional.ofNullable() Allows null, but it does not throw NullPointerException.
-
-There are 3 ways of recovering an optional:
-    1. Optional.get() It is not safe, because it throws an exception if the Optional is empty.
-    Therefore, defeats the purpose of the tool.
-    2. Optional.orElse() Throws a default parameter if it is empty. This parameter must be of the same
-    type of the generic <T>.
-    3. Optional.orElseThrow() Throws a specific, controlled exception.
-    4. Optional.orElseGet() Calls a backup method is the Optional is empty.
-    5. Optional.ifPresent() Executes the given Predicate only if it has a value inside. It is the
-    safe and elegant way of Optional.get(), since it does not act if the Optional is empty.
- */
-
 public class MainHibernate {
-    private static DepartmentImplementationHibernate dImpl;
-    private static EmployeeImplementationHibernate eImpl;
+    private static DepartmentImplementation dImpl;
+    private static EmployeeImplementation eImpl;
 
     public static void main(String[] args) {
 
         System.out.println("Testing Hibernate JPA...");
         try {
-            HibernateManager hibernateManager = HibernateManager.getInstance();
-            hibernateManager.openDB();
+            DatabaseManager databaseManager = DatabaseManager.getInstance();
+            databaseManager.openDB();
 
-            dImpl = new DepartmentImplementationHibernate();
-            eImpl = new EmployeeImplementationHibernate();
+            dImpl = new DepartmentImplementation();
+            eImpl = new EmployeeImplementation();
 
             /*System.out.println(eImpl.findEmployeeByID(18));
             System.out.println();
@@ -62,7 +40,7 @@ public class MainHibernate {
             updateData();
             deleteData();
 
-            hibernateManager.closeDB();
+            databaseManager.closeDB();
         } catch (DatabaseException e) {
             e.printStackTrace();
         }
@@ -145,7 +123,6 @@ public class MainHibernate {
             eImpl.deleteEmployee(18);
             System.out.println(eImpl.findEmployeeByID(18).get());
 
-            // TODO: Printing an empty get still sends fatal exception?
             // TODO: FK exception. Cannot delete a department with employees in it
 
             System.out.println("Deleting Department...");

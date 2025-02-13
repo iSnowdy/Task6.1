@@ -1,8 +1,8 @@
 package Andy.Tests;
 
-import Andy.db4o.Database.DB4OManager;
-import Andy.db4o.Database.DepartmentImplementationDB4O;
-import Andy.db4o.Database.EmployeeImplementationDB4O;
+import Andy.db4o.Database.DatabaseManager;
+import Andy.db4o.Database.DepartmentImplementation;
+import Andy.db4o.Database.EmployeeImplementation;
 import Exceptions.DatabaseClosingException;
 import Exceptions.DatabaseOpeningException;
 import Exceptions.DatabaseDeleteException;
@@ -16,19 +16,19 @@ import Models.Enum.EmployeePosition;
 import java.util.List;
 
 public class MainDB4O {
-    private static DB4OManager db4oManager;
-    private static DepartmentImplementationDB4O departmentDAO;
-    private static EmployeeImplementationDB4O employeeDAO;
+    private static DatabaseManager databaseManager;
+    private static DepartmentImplementation departmentDAO;
+    private static EmployeeImplementation employeeDAO;
 
     public static void main(String[] args) {
         System.out.println("Testing mainDB4O...");
 
-        db4oManager = new DB4OManager();
+        databaseManager = new DatabaseManager();
 
         openDatabase();
 
-        departmentDAO = new DepartmentImplementationDB4O();
-        employeeDAO = new EmployeeImplementationDB4O();
+        departmentDAO = new DepartmentImplementation();
+        employeeDAO = new EmployeeImplementation();
 
         insertData();
         queryData();
@@ -40,8 +40,8 @@ public class MainDB4O {
     private static void openDatabase() {
         System.out.println("\nOpening DB4O...");
         try {
-            db4oManager.openDB();
-            if (DB4OManager.db4oContainer == null) {
+            databaseManager.openDB();
+            if (DatabaseManager.db4oContainer == null) {
                 throw new RuntimeException("DatabaseManager was not initialized correctly");
             }
             System.out.println("Database opened successfully!");
@@ -152,7 +152,7 @@ public class MainDB4O {
     private static void closeDatabase() {
         System.out.println("\nClosing DB4O...");
         try {
-            db4oManager.closeDB();
+            databaseManager.closeDB();
             System.out.println("Database closed successfully!");
         } catch (DatabaseClosingException e) {
             System.out.println("Error closing database: " + e.getMessage());
