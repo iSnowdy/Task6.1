@@ -11,7 +11,7 @@ import com.db4o.ObjectContainer;
  * Provides methods to open and close such connection.
  */
 
-public class DB4OManager implements DatabaseImplementation {
+public class DatabaseManager implements DatabaseImplementation {
     public static ObjectContainer db4oContainer;
 
     /**

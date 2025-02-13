@@ -11,33 +11,33 @@ import org.hibernate.cfg.Configuration;
 /**
  * Manages the Hibernate SessionFactory and database sessions using the Singleton pattern.
  * <p>
- * This class ensures that only one instance of {@link HibernateManager} exists in the application, preventing
+ * This class ensures that only one instance of {@link DatabaseManager} exists in the application, preventing
  * multiple {@code SessionFactory} instances from being created.
  * <p>
  * The {@code openDB()} method initializes the SessionFactory, required before performing any action on the
  * database. Then the session can be retrieved and managed using {@code openSession()} and {@code closeSession()}.
  */
 
-public class HibernateManager implements DatabaseImplementation {
-    private static HibernateManager lazyInstance;
+public class DatabaseManager implements DatabaseImplementation {
+    private static DatabaseManager lazyInstance;
     private SessionFactory sessionFactory;
     private Session session;
     private boolean isOpen = false;
 
-    private HibernateManager() {} // Singleton
+    private DatabaseManager() {} // Singleton
 
     /**
-     * Retrieves the singleton lay instance of {@link HibernateManager}.
+     * Retrieves the singleton lay instance of {@link DatabaseManager}.
      * <p>
      * The instance is created only when this method is called for the first time (Lazy Initialization).
      *
-     * @return The single instance of {@link HibernateManager}.
+     * @return The single instance of {@link DatabaseManager}.
      */
 
-    public static HibernateManager getInstance() {
+    public static DatabaseManager getInstance() {
         // Lazy instance of the Singleton. It will only be opened if this method is called
         if (lazyInstance == null) {
-            lazyInstance = new HibernateManager();
+            lazyInstance = new DatabaseManager();
         }
         return lazyInstance;
     }

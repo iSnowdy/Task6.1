@@ -1,6 +1,8 @@
 package Models;
 
 
+import java.util.Scanner;
+
 public class Employee {
     private int employeeID; // FK auto-generated
     private String employeeName;
@@ -16,14 +18,26 @@ public class Employee {
         this.department = department;
     }
 
+    // TODO: Only for testing purposes. Delete this later on
     public Employee(int employeeID, String employeeName, String employeePosition, int departmentID, Department department) {
         this.employeeID = employeeID;
         this.employeeName = employeeName;
         this.employeePosition = employeePosition;
         this.departmentID = departmentID;
         this.department = department;
+
+
+        int userIntInput = promptUserForInt("Set department ID: ");
+        int userID = promptUserForInt("Set User ID: ");
     }
 
+    private int promptUserForInt(String prompt) {
+        System.out.println(prompt);
+        Scanner scanner = new Scanner(System.in);
+        int a = scanner.nextInt();
+        scanner.nextLine();
+        return a;
+    }
 
     // Compares if the given object as parameter is the same as the one calling the method
     @Override
