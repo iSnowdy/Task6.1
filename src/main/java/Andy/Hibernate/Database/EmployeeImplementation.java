@@ -16,14 +16,15 @@ import java.util.Optional;
 public class EmployeeImplementation extends HibernateBaseImplementation<HEmployee> implements HEmployeeDAO {
 
     /**
-     * Constructs a new {@link EmployeeImplementation} instance.
+     * Constructs a new {@link EmployeeImplementation} instance and injects the {@link DatabaseManager} for Hibernate
+     * into the BaseImplementation.
      * <p>
      * It also initializes the parent class with {@link HEmployee} to specify the entity type since it is using
      * generics.
      */
 
-    public EmployeeImplementation() {
-        super(HEmployee.class);
+    public EmployeeImplementation(final DatabaseManager dbManager) {
+        super(HEmployee.class, dbManager);
     }
 
     /**

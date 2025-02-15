@@ -18,12 +18,13 @@ public class DepartmentImplementation extends DB4OBaseImplementation<Department>
     private final String primaryFieldName = Department.class.getDeclaredFields()[0].getName();
 
     /**
-     * Constructs a DepartmentImplementation instance while specifying the class type for the db4o operations
+     * Constructs a {@code DepartmentImplementation} instance while specifying the class type for the db4o operations and
+     * injects the {@link DatabaseManager} for DB4O operations into {@link DB4OBaseImplementation},
      * inside {@link DB4OBaseImplementation}.
      */
 
-    public DepartmentImplementation() {
-        super(Department.class);
+    public DepartmentImplementation(DatabaseManager dbManager) {
+        super(Department.class, dbManager);
     }
 
     /**

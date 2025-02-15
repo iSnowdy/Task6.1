@@ -27,8 +27,8 @@ public class MainDB4O {
 
         openDatabase();
 
-        departmentDAO = new DepartmentImplementation();
-        employeeDAO = new EmployeeImplementation();
+        departmentDAO = new DepartmentImplementation(databaseManager);
+        employeeDAO = new EmployeeImplementation(databaseManager);
 
         insertData();
         queryData();
@@ -41,7 +41,7 @@ public class MainDB4O {
         System.out.println("\nOpening DB4O...");
         try {
             databaseManager.openDB();
-            if (DatabaseManager.db4oContainer == null) {
+            if (databaseManager.getDb4oContainer() == null) {
                 throw new RuntimeException("DatabaseManager was not initialized correctly");
             }
             System.out.println("Database opened successfully!");

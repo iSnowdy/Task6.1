@@ -18,12 +18,13 @@ public class EmployeeImplementation extends DB4OBaseImplementation<Employee> imp
     private final String primaryFieldName = Employee.class.getDeclaredFields()[0].getName();
 
     /**
-     * Constructs an EmployeeImplementation instance while specifying the class type for the db4o operations
+     * Constructs an {@code EmployeeImplementation} instance while specifying the class type for the db4o operations and
+     * injects the {@link DatabaseManager} for DB4O operations into {@link DB4OBaseImplementation},
      * inside {@link DB4OBaseImplementation}.
      */
 
-    public EmployeeImplementation() {
-        super(Employee.class);
+    public EmployeeImplementation(DatabaseManager dbManager) {
+        super(Employee.class, dbManager);
     }
 
     /**
