@@ -1,11 +1,15 @@
 package Andy.Hibernate.Database;
 
-import Andy.Hibernate.Database.Util.DatabaseManager;
 import Andy.Hibernate.Models.DatabaseEntity;
+import Andy.Hibernate.Models.HDepartment;
+import Andy.Hibernate.Models.HEmployee;
 import Exceptions.DatabaseDeleteException;
 import Exceptions.DatabaseInsertException;
 import Exceptions.DatabaseQueryException;
+import Models.Department;
+import Models.Employee;
 import Utils.ObjectFieldsUtil;
+import Utils.ValidationUtil;
 import org.hibernate.Session;
 
 import java.lang.reflect.Field;
@@ -17,7 +21,7 @@ import java.util.Set;
  * Provides a generic base implementation for Hibernate CRUD operations.
  * <p>
  * This abstract class manages Hibernate interactions for entities that implement {@link DatabaseEntity}, such as
- * {@link Andy.Hibernate.Models.HDepartment} and {@link Andy.Hibernate.Models.HEmployee}.
+ * {@link HDepartment} and {@link HEmployee}.
  * <p>
  * It ensures code reuse and consistency across multiple entity implementations.
  *
@@ -25,12 +29,12 @@ import java.util.Set;
  */
 
 public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
-    // Singleton instance of the Hibernate Manager
-    private final DatabaseManager databaseManager = DatabaseManager.getInstance();
     private final Class<T> clazz;
+    private final DatabaseManager dbManager;
 
-    public HibernateBaseImplementation(Class<T> clazz) {
+    public HibernateBaseImplementation(Class<T> clazz, final DatabaseManager dbManager) {
         this.clazz = clazz;
+        this.dbManager = dbManager;
     }
 
     /**
@@ -57,7 +61,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
 
     protected boolean storeObject(T object) {
         if (!isObjectInDB(object)) {
-            try (Session session = databaseManager.getSessionFactory().openSession()) {
+            try (Session session = dbManager.openSession()) {
                 session.beginTransaction();
                 session.flush();
                 session.persist(object);
@@ -97,13 +101,16 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
     // Given the object which the user wants to modify and the field, it prompts for the new value and then
     // updates it
     private Optional<T> modifyObjectField(T object, Field field) {
-        try (Session session = databaseManager.getSessionFactory().openSession()) {
+        try (Session session = dbManager.openSession()) {
             Object newValue = ObjectFieldsUtil.promptUserForNewValue(field);
 
             session.beginTransaction();
             session.flush();
             field.set(object, newValue);
             session.merge(object); // Overwrites
+
+            if (!ValidationUtil.isValidObject(object, clazz)) return Optional.empty();
+
             session.getTransaction().commit();
 
             System.out.println("Object successfully modified");
@@ -124,7 +131,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
 
     protected boolean deleteObject(T object) {
         if (isObjectInDB(object)) {
-            try (Session session = databaseManager.getSessionFactory().openSession()) {
+            try (Session session = dbManager.openSession()) {
                 session.beginTransaction();
                 session.flush();
                 session.remove(object); //delete()
@@ -149,9 +156,9 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
         String clazzSimpleName = clazz.getSimpleName();
         String query =
                 "FROM " + clazzSimpleName + " o " +
-                        "WHERE o.id = :id";
+                "WHERE o.id = :id";
 
-        try (Session session = databaseManager.getSessionFactory().openSession()) {
+        try (Session session = dbManager.openSession()) {
             return Optional.ofNullable(session.createQuery(query, clazz)
                     .setParameter("id", id)
                     .setReadOnly(false)
@@ -175,7 +182,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
         String query =
                 "FROM " + clazzSimpleName;
 
-        try (Session session = databaseManager.getSessionFactory().openSession()) {
+        try (Session session = dbManager.openSession()) {
             return session.createQuery(query, clazz)
                     .setReadOnly(false)
                     .getResultList();
