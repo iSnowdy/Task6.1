@@ -2,7 +2,7 @@ package Andy.Tests;
 
 import Andy.Hibernate.Database.DepartmentImplementation;
 import Andy.Hibernate.Database.EmployeeImplementation;
-import Andy.Hibernate.Database.Util.DatabaseManager;
+import Andy.Hibernate.Database.DatabaseManager;
 import Andy.Hibernate.Models.HDepartment;
 import Andy.Hibernate.Models.HEmployee;
 import Exceptions.DatabaseDeleteException;
@@ -20,11 +20,11 @@ public class MainHibernate {
 
         System.out.println("Testing Hibernate JPA...");
         try {
-            DatabaseManager databaseManager = DatabaseManager.getInstance();
+            DatabaseManager databaseManager = new DatabaseManager();
             databaseManager.openDB();
 
-            dImpl = new DepartmentImplementation();
-            eImpl = new EmployeeImplementation();
+            dImpl = new DepartmentImplementation(databaseManager);
+            eImpl = new EmployeeImplementation(databaseManager);
 
             /*System.out.println(eImpl.findEmployeeByID(18));
             System.out.println();
