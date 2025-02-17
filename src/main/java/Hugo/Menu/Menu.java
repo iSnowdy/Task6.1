@@ -1,36 +1,57 @@
 package Hugo.Menu;
 
+import Andy.db4o.Database.DatabaseManager;
+
+import java.util.Scanner;
+
 public class Menu {
+    private Scanner scan = new Scanner(System.in);
+    private final DatabaseManager manager;
+    private final UserInteractions userInteractions;
 
-    public static void main(String[] args) {
-
-    }
-    public static void databaseMenu() {
-        System.out.println("\n====================================");
-        System.out.println("|         DATABASE MENU             |");
-        System.out.println("====================================");
-        System.out.println("| 1. File                           |");
-        System.out.println("| 2. PostgreSQL                     |");
-        System.out.println("| 3. Hibernate                      |");
-        System.out.println("| 4. DB4O                           |");
-        System.out.println("| 5. MongoDB                        |");
-        System.out.println("| 6. Close                          |");
-        System.out.println("====================================");
-        System.out.print("Select an option: ");
+    public Menu() {
+        manager = new DatabaseManager();
+        userInteractions = new UserInteractions(manager);
     }
 
-    public static void menu() {
+    public void menuStart() {
+        boolean close = false;
+        manager.openDB();
+
+        while (!close) {
+            menu();
+            int option = scan.nextInt();
+            scan.nextLine();
+
+            switch (option) {
+                case 1 -> {
+                    departmentMenu();
+                }
+                case 2 -> {
+                    employeeMenu();
+                }
+                case 3 -> {
+                    close = true;
+                    manager.closeDB();
+                }
+                default -> System.out.println("Invalid option. Try again: ");
+            }
+
+        }
+    }
+
+    public void menu() {
         System.out.println("\n====================================");
         System.out.println("|            MENU                   |");
         System.out.println("====================================");
         System.out.println("| 1. Department                     |");
         System.out.println("| 2. Employee                       |");
-        System.out.println("| 6. Close                          |");
+        System.out.println("| 3. Close                          |");
         System.out.println("====================================");
         System.out.print("Select an option: ");
     }
 
-    public static void departmentMenu() {
+    public void departmentMenu() {
         System.out.println("\n====================================");
         System.out.println("|        DEPARTMENT MENU            |");
         System.out.println("====================================");
@@ -42,9 +63,30 @@ public class Menu {
         System.out.println("| 6. Close                          |");
         System.out.println("====================================");
         System.out.print("Select an option: ");
+        departmentSwitch();
     }
 
-    public static void employeeMenu() {
+    private void departmentSwitch() {
+        boolean close = false;
+
+        while (!close) {
+            int option = scan.nextInt();
+            scan.nextLine();
+
+            switch (option) {
+                case 1 -> userInteractions.addDepartmentInteraction();
+                case 2 -> userInteractions.updateDepartmentInteraction();
+                case 3 -> userInteractions.deleteDepartmentInteraction();
+                case 4 -> userInteractions.findDepartmentInteraction();
+                case 5 -> userInteractions.findAllDepartmentInteraction();
+                case 6 -> close = true;
+                default -> System.out.println("Invalid option. Try again: ");
+            }
+
+        }
+    }
+
+    public void employeeMenu() {
         System.out.println("\n====================================");
         System.out.println("|         EMPLOYEE MENU             |");
         System.out.println("====================================");
@@ -56,7 +98,26 @@ public class Menu {
         System.out.println("| 6. Close                          |");
         System.out.println("====================================");
         System.out.print("Select an option: ");
+        employeeSwitch();
     }
 
+    private void employeeSwitch() {
+        boolean close = false;
 
+        while (!close) {
+            int option = scan.nextInt();
+            scan.nextLine();
+
+            switch (option) {
+                case 1 -> userInteractions.addEmployeeInteraction();
+                case 2 -> userInteractions.updateEmployeeInteraction();
+                case 3 -> userInteractions.deleteEmployeeInteraction();
+                case 4 -> userInteractions.findEmployeeInteraction();
+                case 5 -> userInteractions.findAllEmployeeInteraction();
+                case 6 -> close = true;
+                default -> System.out.println("Invalid option. Try again: ");
+            }
+
+        }
+    }
 }
