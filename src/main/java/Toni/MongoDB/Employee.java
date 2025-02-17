@@ -1,32 +1,47 @@
-package Models;
+package Toni.MongoDB;
 
 
-public class Employee {
+import jakarta.persistence.Column;
+import org.bson.Document;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
+public class Employee extends Models.Employee {
+//    @Column(name = "nombre", length = 10)
+//    @Column(name = "puesto", length = 15)
+
+
+    @BsonId
+    private ObjectId employe_ID;
+    @BsonProperty("id")
     private int employeeID; // FK auto-generated
+    @BsonProperty("name")
     private String employeeName;
+    @BsonProperty("position")
     private String employeePosition;
 
-    private int departmentID;
     private Department department; // FK references Department
 
-    public Employee(String employeeName, String employeePosition, int departmentID, Department department) {
+    public Employee(String employeeName, String employeePosition, Department department) {
         this.employeeName = employeeName;
         this.employeePosition = employeePosition;
-        this.departmentID = departmentID;
         this.department = department;
     }
 
-    public Employee(int employeeID, String employeeName, String employeePosition, int departmentID, Department department) {
+    public Employee(int employeeID, String employeeName, String employeePosition, Department department) {
         this.employeeID = employeeID;
         this.employeeName = employeeName;
         this.employeePosition = employeePosition;
-        this.departmentID = departmentID;
         this.department = department;
     }
-
-    public Employee(){
-
+    public Employee(Models.Employee employee) {
+        this.employeeID = employee.getEmployeeID();
+        this.employeeName = employee.getEmployeeName();
+        this.employeePosition = employee.getEmployeePosition();
+        this.department = (Department) employee.getDepartment();
     }
+
 
 
     // Compares if the given object as parameter is the same as the one calling the method
@@ -48,8 +63,15 @@ public class Employee {
                 "Employee ID: " + employeeID + "\n" +
                 "Employee Name: " + employeeName + "\n" +
                 "Employee Position: " + employeePosition + "\n" +
-                "Department ID: " + departmentID + "\n" +
+                "Department: " + department + "\n" +
                 "-----------------------\n";
+    }
+
+    public Document toDocument(){
+        return new Document("_id",employe_ID)
+                .append("id",employeeID)
+                .append("name",employeeName)
+                .append("position",employeePosition);
     }
 
 
@@ -73,13 +95,6 @@ public class Employee {
     }
     public void setEmployeePosition(String employeePosition) {
         this.employeePosition = employeePosition;
-    }
-
-    public int getDepartmentID() {
-        return departmentID;
-    }
-    public void setDepartmentID(int departmentID) {
-        this.departmentID = departmentID;
     }
 
     public Department getDepartment() {
