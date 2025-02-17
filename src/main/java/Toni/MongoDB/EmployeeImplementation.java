@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class EmployeeImplementation implements EmployeeDAO {
-    private AccessDB dbAccess;
+    private DatabaseManager dbAccess;
     private final Scanner scanner;
 
     public EmployeeImplementation() {
-        dbAccess = new AccessDB();
+        dbAccess = new DatabaseManager();
         scanner = new Scanner(System.in);
     }
 

@@ -1,5 +1,6 @@
 package Toni.MongoDB;
 
+import Exceptions.DatabaseOpeningException;
 import Utils.Constants;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -17,10 +18,13 @@ import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 
-public class AccessDB {
+public class DatabaseManager {
     private MongoDatabase db;
     private MongoClient mongoClient;
-    public AccessDB() {
+    public DatabaseManager() {
+        openDb();
+    }
+    public void openDb(){
         try {
             // Acceder a una base de datos
             CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
@@ -36,15 +40,12 @@ public class AccessDB {
             db = mongoClient.getDatabase(Constants.MONGO_DB_NAME);
             System.out.println("Conexión exitosa a MongoDB!");
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            throw new DatabaseOpeningException("Error: " + e.getMessage());
         }
     }
-    public void closeSession(){
-        mongoClient.close();
-    }
 
-    public MongoDatabase getDb() {
-        return db;
+    public void closeDb(){
+        mongoClient.close();
     }
 
     public MongoCollection<Document> getCollection(String collectionName){
@@ -55,7 +56,6 @@ public class AccessDB {
         MongoCollection<Document> equiposCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
         Document query = new Document("id",id);
         return equiposCollection.find(query).first();
-
     }
 
     public boolean saveDepartament(Department department){

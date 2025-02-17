@@ -1,19 +1,17 @@
 package Toni.MongoDB;
 
 import DAO.Interfaces.DepartmentDAO;
-import DAO.Interfaces.EmployeeDAO;
-import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
 import java.util.*;
 
 public class DepartmentImplementation implements DepartmentDAO {
-    private AccessDB dbAccess;
+    private DatabaseManager dbAccess;
     private final Scanner scanner;
 
 
     public DepartmentImplementation() {
-        dbAccess = new AccessDB();
+        dbAccess = new DatabaseManager();
         scanner = new Scanner(System.in);
     }
 
