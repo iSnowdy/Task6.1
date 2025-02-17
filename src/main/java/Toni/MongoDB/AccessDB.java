@@ -1,7 +1,6 @@
 package Toni.MongoDB;
 
-import Models.Enum.DepartmentNames;
-import Toni.Constants;
+import Utils.Constants;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
 public class AccessDB {
     private MongoDatabase db;
@@ -35,7 +33,6 @@ public class AccessDB {
                     .applyConnectionString(new ConnectionString(Constants.MONGO_URI))
                     .build();
             mongoClient = MongoClients.create(settings);
-
             db = mongoClient.getDatabase(Constants.MONGO_DB_NAME);
             System.out.println("Conexión exitosa a MongoDB!");
         } catch (Exception e) {
