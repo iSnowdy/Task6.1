@@ -5,22 +5,21 @@ import Andy.db4o.Database.DatabaseManager;
 import java.util.Scanner;
 
 public class Menu {
-    private static Scanner scan = new Scanner(System.in);
-    private static boolean departmentOpened = false;
-    private static boolean employeeOpened = false;
-    private static DatabaseManager manager;
-
-    private UserInteractions userInteractions;
+    private Scanner scan = new Scanner(System.in);
+    private final DatabaseManager manager;
+    private final UserInteractions userInteractions;
 
     public Menu() {
-        userInteractions = new UserInteractions();
+        manager = new DatabaseManager();
+        userInteractions = new UserInteractions(manager);
     }
-    private void menuStart() {
+
+    public void menuStart() {
         boolean close = false;
+        manager.openDB();
 
         while (!close) {
             menu();
-            manager.openDB();
             int option = scan.nextInt();
             scan.nextLine();
 
@@ -47,7 +46,7 @@ public class Menu {
         System.out.println("====================================");
         System.out.println("| 1. Department                     |");
         System.out.println("| 2. Employee                       |");
-        System.out.println("| 6. Close                          |");
+        System.out.println("| 3. Close                          |");
         System.out.println("====================================");
         System.out.print("Select an option: ");
     }
@@ -67,7 +66,7 @@ public class Menu {
         departmentSwitch();
     }
 
-    public void departmentSwitch() {
+    private void departmentSwitch() {
         boolean close = false;
 
         while (!close) {
@@ -102,7 +101,7 @@ public class Menu {
         employeeSwitch();
     }
 
-    public void employeeSwitch() {
+    private void employeeSwitch() {
         boolean close = false;
 
         while (!close) {

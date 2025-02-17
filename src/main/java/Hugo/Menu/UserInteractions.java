@@ -1,6 +1,7 @@
 package Hugo.Menu;
 
 
+import Andy.db4o.Database.DatabaseManager;
 import Andy.db4o.Database.DepartmentImplementation;
 import Andy.db4o.Database.EmployeeImplementation;
 
@@ -17,7 +18,7 @@ public class UserInteractions {
     private static DepartmentImplementation department;
     private static EmployeeImplementation employee;
 
-    public UserInteractions() {
+    public UserInteractions(DatabaseManager dbManager) {
     }
 
     private static Scanner scan = new Scanner(System.in);
@@ -89,19 +90,22 @@ public class UserInteractions {
         scan.nextLine();
 
         Optional<Department> optionalDepartment = department.findDepartmentByID(id);
-        Department employeeDepartment = optionalDepartment.get();
-
-        Employee employeeInput = new Employee(name, position, id, employeeDepartment);
-        if(ValidationUtil.isValidObject(employeeInput, Employee.class)) {
-            employee.addEmployee(employeeInput);
-            System.out.println("Employee created!");
+        if (optionalDepartment.isPresent()) {
+            Department employeeDepartment = optionalDepartment.get();
+            Employee employeeInput = new Employee(name, position, id, employeeDepartment);
+            if(ValidationUtil.isValidObject(employeeInput, Employee.class)) {
+                employee.addEmployee(employeeInput);
+                System.out.println("Employee created!");
+            } else {
+                System.out.println("Employee is not valid");
+            }
         } else {
-            System.out.println("Employee is not valid");
+            System.out.println("Object with ID " + id + " could not be found.");
         }
     }
 
     public void updateEmployeeInteraction() {
-        System.out.println("Set employee ID: ");
+        System.out.println("Set employee ID for update: ");
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidEmployeeId(id)) {
@@ -112,7 +116,7 @@ public class UserInteractions {
     }
 
     public void deleteEmployeeInteraction() {
-        System.out.println("Set employee ID: ");
+        System.out.println("Set employee ID for update: ");
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidEmployeeId(id)) {
@@ -123,7 +127,7 @@ public class UserInteractions {
     }
 
     public void findEmployeeInteraction() {
-        System.out.println("Set employee ID: ");
+        System.out.println("Set employee ID for update: ");
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidEmployeeId(id)) {
