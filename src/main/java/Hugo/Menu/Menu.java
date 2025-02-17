@@ -1,8 +1,6 @@
 package Hugo.Menu;
 
 import Andy.db4o.Database.DatabaseManager;
-import Andy.db4o.Database.DepartmentImplementation;
-import Andy.db4o.Database.EmployeeImplementation;
 
 import java.util.Scanner;
 
@@ -11,8 +9,6 @@ public class Menu {
     private static boolean departmentOpened = false;
     private static boolean employeeOpened = false;
     private static DatabaseManager manager;
-    private static DepartmentImplementation department;
-    private static EmployeeImplementation employee;
 
     private UserInteractions userInteractions;
 
@@ -80,10 +76,10 @@ public class Menu {
 
             switch (option) {
                 case 1 -> userInteractions.addDepartmentInteraction();
-                case 2 -> userInteractions.getObjectID();
-                case 3 -> userInteractions.getObjectID();
-                case 4 -> userInteractions.getObjectID();
-                case 5 -> department.findAllDepartments();
+                case 2 -> userInteractions.updateDepartmentInteraction();
+                case 3 -> userInteractions.deleteDepartmentInteraction();
+                case 4 -> userInteractions.findDepartmentInteraction();
+                case 5 -> userInteractions.findAllDepartmentInteraction();
                 case 6 -> close = true;
                 default -> System.out.println("Invalid option. Try again: ");
             }
@@ -115,10 +111,10 @@ public class Menu {
 
             switch (option) {
                 case 1 -> userInteractions.addEmployeeInteraction();
-                case 2 -> userInteractions.getObjectID();
-                case 3 -> userInteractions.getObjectID();
-                case 4 -> userInteractions.getObjectID();
-                case 5 -> employee.findAllEmployees();
+                case 2 -> userInteractions.updateEmployeeInteraction();
+                case 3 -> userInteractions.deleteEmployeeInteraction();
+                case 4 -> userInteractions.findEmployeeInteraction();
+                case 5 -> userInteractions.findAllEmployeeInteraction();
                 case 6 -> close = true;
                 default -> System.out.println("Invalid option. Try again: ");
             }
