@@ -13,12 +13,13 @@ public class Menu {
     private static DatabaseManager manager;
     private static DepartmentImplementation department;
     private static EmployeeImplementation employee;
-    
-    public static void main(String[] args) {
-        menuStart();
-    }
 
-    private static void menuStart() {
+    private UserInteractions userInteractions;
+
+    public Menu() {
+        userInteractions = new UserInteractions();
+    }
+    private void menuStart() {
         boolean close = false;
 
         while (!close) {
@@ -30,17 +31,9 @@ public class Menu {
             switch (option) {
                 case 1 -> {
                     departmentMenu();
-                    if (!departmentOpened) {
-                        department = new DepartmentImplementation();
-                    }
-                    departmentOpened = true;
                 }
                 case 2 -> {
                     employeeMenu();
-                    if (!employeeOpened) {
-                        employee = new EmployeeImplementation();
-                    }
-                    employeeOpened = true;
                 }
                 case 3 -> {
                     close = true;
@@ -52,7 +45,7 @@ public class Menu {
         }
     }
 
-    public static void menu() {
+    public void menu() {
         System.out.println("\n====================================");
         System.out.println("|            MENU                   |");
         System.out.println("====================================");
@@ -63,7 +56,7 @@ public class Menu {
         System.out.print("Select an option: ");
     }
 
-    public static void departmentMenu() {
+    public void departmentMenu() {
         System.out.println("\n====================================");
         System.out.println("|        DEPARTMENT MENU            |");
         System.out.println("====================================");
@@ -78,7 +71,7 @@ public class Menu {
         departmentSwitch();
     }
 
-    public static void departmentSwitch() {
+    public void departmentSwitch() {
         boolean close = false;
 
         while (!close) {
@@ -86,10 +79,10 @@ public class Menu {
             scan.nextLine();
 
             switch (option) {
-                case 1 -> department.addDepartment(UserInteractions.addDepartmentInteraction());
-                case 2 -> department.updateDepartment(UserInteractions.getObjectID());
-                case 3 -> department.deleteDepartment(UserInteractions.getObjectID());
-                case 4 -> department.findDepartmentByID(UserInteractions.getObjectID());
+                case 1 -> userInteractions.addDepartmentInteraction();
+                case 2 -> userInteractions.getObjectID();
+                case 3 -> userInteractions.getObjectID();
+                case 4 -> userInteractions.getObjectID();
                 case 5 -> department.findAllDepartments();
                 case 6 -> close = true;
                 default -> System.out.println("Invalid option. Try again: ");
@@ -98,7 +91,7 @@ public class Menu {
         }
     }
 
-    public static void employeeMenu() {
+    public void employeeMenu() {
         System.out.println("\n====================================");
         System.out.println("|         EMPLOYEE MENU             |");
         System.out.println("====================================");
@@ -113,7 +106,7 @@ public class Menu {
         employeeSwitch();
     }
 
-    public static void employeeSwitch() {
+    public void employeeSwitch() {
         boolean close = false;
 
         while (!close) {
@@ -121,10 +114,10 @@ public class Menu {
             scan.nextLine();
 
             switch (option) {
-                case 1 -> employee.addEmployee(UserInteractions.addEmployeeInteraction());
-                case 2 -> employee.updateEmployee(UserInteractions.getObjectID());
-                case 3 -> employee.deleteEmployee(UserInteractions.getObjectID());
-                case 4 -> employee.findEmployeeByID(UserInteractions.getObjectID());
+                case 1 -> userInteractions.addEmployeeInteraction();
+                case 2 -> userInteractions.getObjectID();
+                case 3 -> userInteractions.getObjectID();
+                case 4 -> userInteractions.getObjectID();
                 case 5 -> employee.findAllEmployees();
                 case 6 -> close = true;
                 default -> System.out.println("Invalid option. Try again: ");

@@ -1,17 +1,21 @@
 package Hugo.Menu;
 
+import Andy.Hibernate.Models.HDepartment;
 import Models.Department;
 import Models.Employee;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class UserInteractions {
 
+    public UserInteractions() {
+    }
+
     private static Scanner scan = new Scanner(System.in);
 
-
     // TODO Añadir verificaciones
-    public static Department addDepartmentInteraction() {
+    public Department addDepartmentInteraction() {
         System.out.println("Set department ID: ");
         int id = scan.nextInt();
         scan.nextLine();
@@ -25,7 +29,7 @@ public class UserInteractions {
         return department;
     }
 
-    public static Employee addEmployeeInteraction() {
+    public Employee addEmployeeInteraction() {
         System.out.println("Set employee name: ");
         String name = scan.nextLine();
         System.out.println("Set employee position: ");
@@ -35,12 +39,12 @@ public class UserInteractions {
         scan.nextLine();
 
         // TODO buscar departamento por el ID introducido
-        Department department = null;
-        Employee employee = new Employee(name, position, id, department);
+        List<Department> department = null;
+        Employee employee = new Employee(name, position, id, (Department) department);
         return employee;
     }
 
-    public static Object getObjectID() {
+    public Object getObjectID() {
         System.out.println("Set ID: ");
         int id = scan.nextInt();
         scan.nextLine();
