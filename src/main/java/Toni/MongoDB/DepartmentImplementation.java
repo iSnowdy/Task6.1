@@ -2,20 +2,17 @@ package Toni.MongoDB;
 
 import DAO.Interfaces.DepartmentDAO;
 import DAO.Interfaces.EmployeeDAO;
-import Toni.MongoDB.Department;
-import Toni.MongoDB.Employee;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
-import javax.management.modelmbean.ModelMBean;
 import java.util.*;
 
-public class PlaceholderClass implements EmployeeDAO, DepartmentDAO {
+public class DepartmentImplementation implements DepartmentDAO {
     private AccessDB dbAccess;
     private final Scanner scanner;
 
 
-    public PlaceholderClass() {
+    public DepartmentImplementation() {
         dbAccess = new AccessDB();
         scanner = new Scanner(System.in);
     }
@@ -88,31 +85,4 @@ public class PlaceholderClass implements EmployeeDAO, DepartmentDAO {
         return departmentList;
     }
 
-    @Override
-    public void addEmployee(Models.Employee employee) {
-        MongoCollection<Document> equiposCollection = dbAccess.getCollection("departamento");
-        Employee dep = new Employee(employee);
-        equiposCollection.insertOne(dep.toDocument());
-    }
-
-
-    @Override
-    public Optional<Models.Employee> updateEmployee(Object id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean deleteEmployee(Object id) {
-        return false;
-    }
-
-    @Override
-    public Optional<Models.Employee> findEmployeeByID(Object id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Models.Employee> findAllEmployees() {
-        return List.of();
-    }
 }
