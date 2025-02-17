@@ -11,8 +11,9 @@ import com.db4o.ObjectContainer;
  * Provides methods to open and close such connection.
  */
 
-public class DB4OManager implements DatabaseImplementation {
-    public static ObjectContainer db4oContainer;
+public class DatabaseManager implements DatabaseImplementation {
+    private ObjectContainer db4oContainer;
+
 
     /**
      * Opens a connection to the db4o database file.
@@ -48,5 +49,18 @@ public class DB4OManager implements DatabaseImplementation {
                 throw new DatabaseClosingException("Error closing database " + db4oDatabaseName, e);
             }
         }
+    }
+
+    /**
+     * Retrieves the db4o ObjectContainer for database operations.
+     *
+     * @return The ObjectContainer instance.
+     */
+
+    public ObjectContainer getDb4oContainer() {
+        if (db4oContainer == null) {
+            throw new IllegalStateException("Database is not open. Call openDB() first.");
+        }
+        return db4oContainer;
     }
 }

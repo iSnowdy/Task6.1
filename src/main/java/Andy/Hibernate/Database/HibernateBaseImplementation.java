@@ -1,22 +1,27 @@
 package Andy.Hibernate.Database;
 
-import Andy.Hibernate.Database.Util.HibernateManager;
 import Andy.Hibernate.Models.DatabaseEntity;
+import Andy.Hibernate.Models.HDepartment;
+import Andy.Hibernate.Models.HEmployee;
 import Exceptions.DatabaseDeleteException;
 import Exceptions.DatabaseInsertException;
 import Exceptions.DatabaseQueryException;
+import Models.Department;
+import Models.Employee;
+import Utils.ObjectFieldsUtil;
+import Utils.ValidationUtil;
 import org.hibernate.Session;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Provides a generic base implementation for Hibernate CRUD operations.
  * <p>
  * This abstract class manages Hibernate interactions for entities that implement {@link DatabaseEntity}, such as
- * {@link Andy.Hibernate.Models.HDepartment} and {@link Andy.Hibernate.Models.HEmployee}.
+ * {@link HDepartment} and {@link HEmployee}.
  * <p>
  * It ensures code reuse and consistency across multiple entity implementations.
  *
@@ -24,13 +29,12 @@ import java.util.Scanner;
  */
 
 public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
-    // Singleton instance of the Hibernate Manager
-    private final HibernateManager hibernateManager = HibernateManager.getInstance();
     private final Class<T> clazz;
-    private final Scanner scanner = new Scanner(System.in);
+    private final DatabaseManager dbManager;
 
-    public HibernateBaseImplementation(Class<T> clazz) {
+    public HibernateBaseImplementation(Class<T> clazz, final DatabaseManager dbManager) {
         this.clazz = clazz;
+        this.dbManager = dbManager;
     }
 
     /**
@@ -57,7 +61,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
 
     protected boolean storeObject(T object) {
         if (!isObjectInDB(object)) {
-            try (Session session = hibernateManager.getSessionFactory().openSession()) {
+            try (Session session = dbManager.openSession()) {
                 session.beginTransaction();
                 session.flush();
                 session.persist(object);
@@ -71,71 +75,42 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
     }
 
     /**
-     * Updates an entity by allowing the user to select the specific field which they want to modify and then
-     * prompting for the new value.
+     * Updates an entity by allowing the user to select a specific field to modify and then prompting for a new value.
      *
      * @param id The ID of the entity to be modified.
      * @return An {@code Optional<T>} containing the updated entity, or {@code Optional.empty()} if the entity
-     * was not found.
+     * was not found or the update was unsuccessful.
      */
 
     protected Optional<T> updateObject(Object id) {
         Optional<T> objectInDB = getObject(id);
         if (objectInDB.isEmpty()) {
-            System.out.println("No such object ID " + id);
+            System.out.println("No object found with ID: " + id);
             return Optional.empty();
         }
 
-        T objectedToUpdate = objectInDB.get();
-        Optional<Field> fieldToUpdate = promptUserForFieldSelection(objectedToUpdate);
+        T objectToUpdate = objectInDB.get();
+        Set<String> excludedFields = Set.of("id", "employeeList", "HDepartment"); // Exclude ID and relations
+
+        Optional<Field> fieldToUpdate = ObjectFieldsUtil.promptUserForFieldSelection(objectToUpdate, excludedFields);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
-        return modifyObjectField(objectedToUpdate, fieldToUpdate.get());
-    }
-
-    private Optional<Field> promptUserForFieldSelection(T object) {
-        printObjectFields();
-        int fieldIndex = scanner.nextInt();
-        scanner.nextLine();
-
-        if (isInvalidFieldIndex(fieldIndex, object)) {
-            System.out.println("Invalid field selection");
-            return Optional.empty();
-        }
-        // Indexes?
-        Field field = object.getClass().getDeclaredFields()[fieldIndex];
-        System.out.println("Field " + field.getName() + " selected");
-        field.setAccessible(true);
-        return Optional.of(field);
-    }
-
-    // Using Java Reflection, it retrieves all available fields inside <T> and prints them to the user
-    private void printObjectFields() {
-        Field[] fields = clazz.getDeclaredFields();
-        System.out.println("Select one of the available fields to modify:");
-        // TODO: Consider making it so that the user cannot change the ID (int i = 1)
-        // TODO: Double-check what fields are we printing. For Department it is also
-        //       printing the Employee List which it should not and for Employee the Department
-        for (int i = 0; i < fields.length; i++) {
-            fields[i].setAccessible(true);
-            System.out.println(i + ". " + fields[i].getName());
-        }
-    }
-
-    private boolean isInvalidFieldIndex(int fieldIndex, T object) {
-        return fieldIndex > object.getClass().getDeclaredFields().length - 1 || fieldIndex < 0;
+        return modifyObjectField(objectToUpdate, fieldToUpdate.get());
     }
 
     // Given the object which the user wants to modify and the field, it prompts for the new value and then
     // updates it
     private Optional<T> modifyObjectField(T object, Field field) {
-        try (Session session = hibernateManager.getSessionFactory().openSession()) {
-            Object newValue = promptUserForNewValue(field);
+        try (Session session = dbManager.openSession()) {
+            Object newValue = ObjectFieldsUtil.promptUserForNewValue(field);
 
             session.beginTransaction();
             session.flush();
             field.set(object, newValue);
             session.merge(object); // Overwrites
+
+            if (!ValidationUtil.isValidObject(object, clazz)) return Optional.empty();
+
             session.getTransaction().commit();
 
             System.out.println("Object successfully modified");
@@ -144,17 +119,6 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
             System.out.println("Object ID " + object.getID() + " could not be updated");
             throw new DatabaseQueryException("Could not update the object ID " + object.getID() + " in Hibernate JPA", e);
         }
-    }
-
-    private Object promptUserForNewValue(Field field) {
-        System.out.println("Enter the new value for " + field.getName() + ": ");
-        Object newValue;
-
-        if (field.getType() == int.class) {
-            newValue = scanner.nextInt();
-            scanner.nextLine();
-        } else newValue = scanner.nextLine();
-        return newValue;
     }
 
     /**
@@ -167,7 +131,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
 
     protected boolean deleteObject(T object) {
         if (isObjectInDB(object)) {
-            try (Session session = hibernateManager.getSessionFactory().openSession()) {
+            try (Session session = dbManager.openSession()) {
                 session.beginTransaction();
                 session.flush();
                 session.remove(object); //delete()
@@ -192,9 +156,9 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
         String clazzSimpleName = clazz.getSimpleName();
         String query =
                 "FROM " + clazzSimpleName + " o " +
-                        "WHERE o.id = :id";
+                "WHERE o.id = :id";
 
-        try (Session session = hibernateManager.getSessionFactory().openSession()) {
+        try (Session session = dbManager.openSession()) {
             return Optional.ofNullable(session.createQuery(query, clazz)
                     .setParameter("id", id)
                     .setReadOnly(false)
@@ -218,7 +182,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
         String query =
                 "FROM " + clazzSimpleName;
 
-        try (Session session = hibernateManager.getSessionFactory().openSession()) {
+        try (Session session = dbManager.openSession()) {
             return session.createQuery(query, clazz)
                     .setReadOnly(false)
                     .getResultList();

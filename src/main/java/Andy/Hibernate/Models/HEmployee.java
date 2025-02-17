@@ -13,7 +13,7 @@ public class HEmployee implements DatabaseEntity {
     @Column(name = "nombre", length = 10)
     private String employeeName;
     @Column(name = "puesto", length = 15)
-    private String employeeJob;
+    private String employeePosition;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depno")
     private HDepartment HDepartment;
@@ -23,7 +23,7 @@ public class HEmployee implements DatabaseEntity {
     // Employee ID is auto generated. We should not need to pass it as a parameter to the constructor
     public HEmployee(String departmentName, String departmentAddress, HDepartment HDepartment) {
         this.employeeName = departmentName;
-        this.employeeJob = departmentAddress;
+        this.employeePosition = departmentAddress;
         this.HDepartment = HDepartment;
     }
 
@@ -36,7 +36,7 @@ public class HEmployee implements DatabaseEntity {
                 "-----------------------\n" +
                 "Employee ID: " + id + "\n" +
                 "Employee Name: " + employeeName + "\n" +
-                "Employee Position: " + employeeJob + "\n" +
+                "Employee Position: " + employeePosition + "\n" +
                 "Department ID: " + HDepartment.getId() + "\n" +
                 "-----------------------\n";
     }
@@ -62,11 +62,11 @@ public class HEmployee implements DatabaseEntity {
         this.employeeName = Employee_Name;
     }
 
-    public String getEmployeeJob() {
-        return employeeJob;
+    public String getEmployeePosition() {
+        return employeePosition;
     }
-    public void setEmployeeJob(String Employee_Job) {
-        this.employeeJob = Employee_Job;
+    public void setEmployeePosition(String Employee_Job) {
+        this.employeePosition = Employee_Job;
     }
 
     public HDepartment getDepartment() {

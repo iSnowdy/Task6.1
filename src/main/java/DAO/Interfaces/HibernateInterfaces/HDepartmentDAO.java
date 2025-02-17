@@ -1,7 +1,5 @@
 package DAO.Interfaces.HibernateInterfaces;
 
-// TODO: Pascual :)
-
 import Andy.Hibernate.Models.HDepartment;
 
 import java.util.List;

@@ -5,8 +5,6 @@ import Andy.Hibernate.Models.HEmployee;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: Pascual :(
-
 public interface HEmployeeDAO {
     void addEmployee(HEmployee employee);
     Optional<HEmployee> updateEmployee(Object id);

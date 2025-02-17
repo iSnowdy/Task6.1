@@ -13,17 +13,18 @@ import java.util.Optional;
  * {@link HEmployee} entity.
  */
 
-public class EmployeeImplementationHibernate extends HibernateBaseImplementation<HEmployee> implements HEmployeeDAO {
+public class EmployeeImplementation extends HibernateBaseImplementation<HEmployee> implements HEmployeeDAO {
 
     /**
-     * Constructs a new {@link EmployeeImplementationHibernate} instance.
+     * Constructs a new {@link EmployeeImplementation} instance and injects the {@link DatabaseManager} for Hibernate
+     * into the BaseImplementation.
      * <p>
      * It also initializes the parent class with {@link HEmployee} to specify the entity type since it is using
      * generics.
      */
 
-    public EmployeeImplementationHibernate() {
-        super(HEmployee.class);
+    public EmployeeImplementation(final DatabaseManager dbManager) {
+        super(HEmployee.class, dbManager);
     }
 
     /**

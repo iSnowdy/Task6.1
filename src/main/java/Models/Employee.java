@@ -24,10 +24,6 @@ public class Employee {
         this.department = department;
     }
 
-    public Employee(){
-
-    }
-
 
     // Compares if the given object as parameter is the same as the one calling the method
     @Override
