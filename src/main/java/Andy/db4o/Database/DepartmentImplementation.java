@@ -13,17 +13,18 @@ import java.util.Optional;
  * Provides CRUD operations for managing {@link Department} entities inside the db4o database.
  */
 
-public class DepartmentImplementationDB4O extends DB4OBaseImplementation<Department> implements DepartmentDAO {
+public class DepartmentImplementation extends DB4OBaseImplementation<Department> implements DepartmentDAO {
     // Java Reflection to extract the name of the PK field
     private final String primaryFieldName = Department.class.getDeclaredFields()[0].getName();
 
     /**
-     * Constructs a DepartmentImplementation instance while specifying the class type for the db4o operations
+     * Constructs a {@code DepartmentImplementation} instance while specifying the class type for the db4o operations and
+     * injects the {@link DatabaseManager} for DB4O operations into {@link DB4OBaseImplementation},
      * inside {@link DB4OBaseImplementation}.
      */
 
-    public DepartmentImplementationDB4O() {
-        super(Department.class);
+    public DepartmentImplementation(DatabaseManager dbManager) {
+        super(Department.class, dbManager);
     }
 
     /**

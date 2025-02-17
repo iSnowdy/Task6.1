@@ -13,17 +13,18 @@ import java.util.Optional;
  * {@link HDepartment} entity.
  */
 
-public class DepartmentImplementationHibernate extends HibernateBaseImplementation<HDepartment> implements HDepartmentDAO {
+public class DepartmentImplementation extends HibernateBaseImplementation<HDepartment> implements HDepartmentDAO {
 
     /**
-     * Constructs a new {@link DepartmentImplementationHibernate} instance.
+     * Constructs a new {@link DepartmentImplementation} instance and injects the {@link DatabaseManager} for Hibernate
+     * into the BaseImplementation.
      * <p>
      * It also initializes the parent class {@link HibernateBaseImplementation} with {@link HDepartment} to specify
      * the entity type.
      */
 
-    public DepartmentImplementationHibernate() {
-        super(HDepartment.class);
+    public DepartmentImplementation(final DatabaseManager dbManager) {
+        super(HDepartment.class, dbManager);
     }
 
     /**
