@@ -1,6 +1,5 @@
 package Hugo.Menu;
 
-
 import Andy.db4o.Database.DatabaseManager;
 import Andy.db4o.Database.DepartmentImplementation;
 import Andy.db4o.Database.EmployeeImplementation;
@@ -15,10 +14,16 @@ import java.util.Scanner;
 
 public class UserInteractions {
 
-    private static DepartmentImplementation department;
-    private static EmployeeImplementation employee;
+    private DepartmentImplementation department;
+    private EmployeeImplementation employee;
 
     public UserInteractions(DatabaseManager dbManager) {
+        if (department == null) {
+            this.department = new DepartmentImplementation(dbManager);
+        }
+        if (employee == null) {
+            this.employee = new EmployeeImplementation(dbManager);
+        }
     }
 
     private static Scanner scan = new Scanner(System.in);
@@ -33,17 +38,16 @@ public class UserInteractions {
         String address = scan.nextLine();
 
         Department departmentInput = new Department(id, name, address);
-
         if(ValidationUtil.isValidObject(departmentInput, Department.class)) {
             department.addDepartment(departmentInput);
             System.out.println("Department created!");
         } else {
             System.out.println("Department is not valid");
-
         }
     }
 
     public void updateDepartmentInteraction() {
+        findAllDepartmentInteraction().forEach(System.out::println);
         System.out.println("Set department ID: ");
         int id = scan.nextInt();
         scan.nextLine();
@@ -55,11 +59,13 @@ public class UserInteractions {
     }
 
     public void deleteDepartmentInteraction() {
+        findAllDepartmentInteraction().forEach(System.out::println);
         System.out.println("Set department ID: ");
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidDepartmentId(id)) {
             department.deleteDepartment(id);
+            System.out.println("Department with id: "+id+" deleted!");
         } else {
             System.out.println("Department ID is not valid");
         }
@@ -70,14 +76,20 @@ public class UserInteractions {
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidDepartmentId(id)) {
-            department.findDepartmentByID(id);
+            if (department.findDepartmentByID(id).isPresent()) {
+                System.out.println(department.findDepartmentByID(id).get());
+            }
         } else {
             System.out.println("Department ID is not valid");
         }
     }
 
-    public void findAllDepartmentInteraction() {
-        department.findAllDepartments();
+    private List<Department> findAllDepartmentInteraction() {
+        return department.findAllDepartments();
+    }
+
+    public void printAllDepartments() {
+        findAllDepartmentInteraction().forEach(System.out::println);
     }
 
     public void addEmployeeInteraction() {
@@ -105,6 +117,7 @@ public class UserInteractions {
     }
 
     public void updateEmployeeInteraction() {
+        findAllEmployeeInteraction().forEach(System.out::println);
         System.out.println("Set employee ID for update: ");
         int id = scan.nextInt();
         scan.nextLine();
@@ -116,11 +129,13 @@ public class UserInteractions {
     }
 
     public void deleteEmployeeInteraction() {
+        findAllEmployeeInteraction().forEach(System.out::println);
         System.out.println("Set employee ID for update: ");
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidEmployeeId(id)) {
             employee.deleteEmployee(id);
+            System.out.println("Employee with id: "+id+" deleted!");
         } else {
             System.out.println("Employee ID is not valid");
         }
@@ -137,7 +152,11 @@ public class UserInteractions {
         }
     }
 
-    public void findAllEmployeeInteraction() {
-        employee.findAllEmployees();
+    private List<Employee> findAllEmployeeInteraction() {
+        return employee.findAllEmployees();
+    }
+
+    public void printAllEmployees() {
+        findAllEmployeeInteraction().forEach(System.out::println);
     }
 }
