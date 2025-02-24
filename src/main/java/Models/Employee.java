@@ -18,6 +18,9 @@ public class Employee {
         this.department = department;
     }
 
+    public Employee() {}
+
+
     // TODO: Only for testing purposes. Delete this later on
     public Employee(int employeeID, String employeeName, String employeePosition, int departmentID, Department department) {
         this.employeeID = employeeID;

@@ -4,6 +4,7 @@ import Exceptions.DatabaseDeleteException;
 import Exceptions.DatabaseInsertException;
 import Exceptions.DatabaseQueryException;
 import Models.Department;
+import Models.Employee;
 import Utils.ObjectFieldsUtil;
 import Utils.ValidationUtil;
 
@@ -46,7 +47,6 @@ public abstract class PostgreBaseImplementation<T> {
             String query = "INSERT INTO department (depno, nombre, ubicacion) VALUES (?, ?, ?)";
             try {
                 Connection connection = dbManager.getConnection();
-                System.out.println(dbManager.isConnectionOpen());
                 PreparedStatement pstmt = connection.prepareStatement(query);
                 pstmt.setInt(1, department.getDepartmentID());
                 pstmt.setString(2, department.getDepartmentName());
@@ -157,6 +157,141 @@ public abstract class PostgreBaseImplementation<T> {
             return departments;
         } catch (SQLException e) {
             throw new DatabaseQueryException("Error querying all departments in PostgreSQL", e);
+        }
+    }
+
+    public boolean storePostgreEmployee(Employee employee) {
+        if (!isEmployeeInDB(employee)) {
+            String query = "INSERT INTO employee (empno, nombre, puesto, depno) VALUES (?, ?, ?, ?)";
+            try {
+                Connection connection = dbManager.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, employee.getEmployeeID());
+                pstmt.setString(2, employee.getEmployeeName());
+                pstmt.setString(3, employee.getEmployeePosition());
+                pstmt.setInt(4, employee.getEmployeeID());
+                int rowsAffected = pstmt.executeUpdate();
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                throw new DatabaseInsertException("Could not store the department in PostgreSQL", e);
+            }
+        }
+        return false;
+    }
+
+    private boolean isEmployeeInDB(Employee employee) {
+        String query = "SELECT * FROM employee WHERE empno = ?";
+        try (Connection connection = dbManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, employee.getEmployeeID());
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            throw new DatabaseQueryException("Error checking if employee exists in PostgreSQL", e);
+        }
+    }
+
+    public Optional<Employee> updatePostgreEmployee(Integer empno) {
+        Optional<Employee> employeeOptional = getEmployee(empno);
+        if (employeeOptional.isEmpty()) {
+            System.out.println("Department with ID " + empno + " could not be found.");
+            return Optional.empty();
+        }
+
+        Employee employeeToUpdate = employeeOptional.get();
+        Set<String> excludedFields = Set.of("empno"); // Exclude primary key from modification
+
+        Optional<Field> fieldToUpdate = ObjectFieldsUtil.promptUserForFieldSelection(employeeToUpdate, excludedFields);
+        if (fieldToUpdate.isEmpty()) return Optional.empty();
+
+        return modifyDepartmentField(employeeToUpdate, fieldToUpdate.get());
+    }
+
+    private Optional<Employee> modifyDepartmentField(Employee employee, Field field) {
+        String column;
+        try {
+            Object newValue = ObjectFieldsUtil.promptUserForNewValue(field);
+            field.set(employee, newValue);
+
+            if (!ValidationUtil.isValidObject(employee, Employee.class)) return Optional.empty();
+
+            if (field.getName().equalsIgnoreCase("employeeName")) {
+                column = "nombre";
+            } else if (field.getName().equalsIgnoreCase("employeePosition")) {
+                column = "puesto";
+            } else {
+                column = "depno";
+            }
+            String query = "UPDATE employee SET " + column + " = ? WHERE empno = ?";
+            try (Connection connection = dbManager.getConnection();
+                 PreparedStatement pstmt = connection.prepareStatement(query)) {
+                pstmt.setObject(1, newValue);
+                pstmt.setInt(2, employee.getEmployeeID());
+                pstmt.executeUpdate();
+                System.out.println("Employee successfully updated");
+                return Optional.of(employee);
+            }
+        } catch (Exception e) {
+            System.out.println("Employee could not be updated");
+            throw new DatabaseQueryException("Employee could not be updated in PostgreSQL", e);
+        }
+    }
+
+    public boolean deletePostgreDepartment(Employee employee) {
+        if (isEmployeeInDB(employee)) {
+            String query = "DELETE FROM employee WHERE empno = ?";
+            try (Connection connection = dbManager.getConnection();
+                 PreparedStatement pstmt = connection.prepareStatement(query)) {
+                pstmt.setInt(1, employee.getEmployeeID());
+                pstmt.executeUpdate();
+                return true;
+            } catch (SQLException e) {
+                throw new DatabaseDeleteException("Could not delete the employee in PostgreSQL", e);
+            }
+        }
+        return false;
+    }
+
+    public Optional<Employee> getEmployee(Integer empno) {
+        String query = "SELECT * FROM employee WHERE empno = ?";
+        try (Connection connection = dbManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, empno);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Employee employee = new Employee();
+                employee.setEmployeeID(rs.getInt("empno"));
+                employee.setEmployeeName(rs.getString("nombre"));
+                employee.setEmployeePosition(rs.getString("puesto"));
+                employee.setDepartmentID(rs.getInt("depno"));
+                return Optional.of(employee);
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new DatabaseQueryException("Error querying employee in PostgreSQL", e);
+        }
+    }
+
+    public List<Employee> getAllPostgreEmployees() {
+        String query = "SELECT * FROM employee";
+        List<Employee> employees = new ArrayList<>();
+
+        try (Connection connection = dbManager.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Employee employee = new Employee();
+                employee.setEmployeeID(rs.getInt("empno"));
+                employee.setEmployeeName(rs.getString("nombre"));
+                employee.setEmployeePosition(rs.getString("puesto"));
+                employee.setDepartmentID(rs.getInt("depno"));
+                employees.add(employee);
+            }
+            return employees;
+        } catch (SQLException e) {
+            throw new DatabaseQueryException("Error querying all employees in PostgreSQL", e);
         }
     }
 }
