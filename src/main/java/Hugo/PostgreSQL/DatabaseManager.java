@@ -16,13 +16,17 @@ public class DatabaseManager implements DatabaseImplementation {
     // User information
     private final String USERNAME = "hugo";
     private final String PASSWORD = "1234";
-    private static Connection connection;
+    private Connection connection;
+
+    public DatabaseManager() {
+        openDB();
+    }
 
     @Override
     public void openDB() {
         this.VALIDURL = URL + HOST + PORT + DBNAME;
         try {
-            this.connection = DriverManager.getConnection(this.VALIDURL, this.USERNAME, this.PASSWORD);
+            connection = DriverManager.getConnection(this.VALIDURL, this.USERNAME, this.PASSWORD);
             System.out.println("You have been succesfully connected to the PostgreSQL" +
                     " database");
         } catch (SQLException sqlException) {
@@ -43,6 +47,26 @@ public class DatabaseManager implements DatabaseImplementation {
         } catch (SQLException sqlException) {
             System.err.println("Error closing connection");
             sqlException.printStackTrace();
+        }
+    }
+
+    public Connection getConnection() throws SQLException {
+        if (connection.isClosed()) {
+            openDB();
+        }
+        return connection;
+    }
+
+    public boolean isConnectionOpen() {
+        if (connection == null) {
+            openDB();
+        }
+
+        try {
+            return connection.isClosed();
+        } catch (SQLException sqlException) {
+            System.err.println("Error checking if connection is closed");
+            return false;
         }
     }
 }
