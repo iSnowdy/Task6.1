@@ -1,8 +1,5 @@
 package Models;
 
-
-import java.util.Scanner;
-
 public class Employee {
     private int employeeID; // FK auto-generated
     private String employeeName;
@@ -25,18 +22,6 @@ public class Employee {
         this.employeePosition = employeePosition;
         this.departmentID = departmentID;
         this.department = department;
-
-
-        int userIntInput = promptUserForInt("Set department ID: ");
-        int userID = promptUserForInt("Set User ID: ");
-    }
-
-    private int promptUserForInt(String prompt) {
-        System.out.println(prompt);
-        Scanner scanner = new Scanner(System.in);
-        int a = scanner.nextInt();
-        scanner.nextLine();
-        return a;
     }
 
     // Compares if the given object as parameter is the same as the one calling the method
@@ -53,13 +38,13 @@ public class Employee {
     public String toString() {
         return
                 "-----------------------\n" +
-                "Employee Information\n" +
-                "-----------------------\n" +
-                "Employee ID: " + employeeID + "\n" +
-                "Employee Name: " + employeeName + "\n" +
-                "Employee Position: " + employeePosition + "\n" +
-                "Department ID: " + departmentID + "\n" +
-                "-----------------------\n";
+                        "Employee Information\n" +
+                        "-----------------------\n" +
+                        "Employee ID: " + employeeID + "\n" +
+                        "Employee Name: " + employeeName + "\n" +
+                        "Employee Position: " + employeePosition + "\n" +
+                        "Department ID: " + departmentID + "\n" +
+                        "-----------------------\n";
     }
 
 
@@ -67,6 +52,7 @@ public class Employee {
     public int getEmployeeID() {
         return employeeID;
     }
+
     public void setEmployeeID(int employeeID) {
         this.employeeID = employeeID;
     }
@@ -74,6 +60,7 @@ public class Employee {
     public String getEmployeeName() {
         return employeeName;
     }
+
     public void setEmployeeName(String employeeName) {
         this.employeeName = employeeName;
     }
@@ -81,6 +68,7 @@ public class Employee {
     public String getEmployeePosition() {
         return employeePosition;
     }
+
     public void setEmployeePosition(String employeePosition) {
         this.employeePosition = employeePosition;
     }
@@ -88,6 +76,7 @@ public class Employee {
     public int getDepartmentID() {
         return departmentID;
     }
+
     public void setDepartmentID(int departmentID) {
         this.departmentID = departmentID;
     }
@@ -95,6 +84,7 @@ public class Employee {
     public Department getDepartment() {
         return department;
     }
+
     public void setDepartment(Department department) {
         this.department = department;
     }

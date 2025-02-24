@@ -6,8 +6,6 @@ import Andy.Hibernate.Models.HEmployee;
 import Exceptions.DatabaseDeleteException;
 import Exceptions.DatabaseInsertException;
 import Exceptions.DatabaseQueryException;
-import Models.Department;
-import Models.Employee;
 import Utils.ObjectFieldsUtil;
 import Utils.ValidationUtil;
 import org.hibernate.Session;
@@ -38,16 +36,30 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
     }
 
     /**
-     * Checks whether an object exists or not in the database.
+     * Checks whether the given object exists in the database.
+     * <p>
+     * If the object has an assigned ID, it queries the database using that ID.
+     * If the object does not have an assigned ID and is an instance of {@link HEmployee},
+     * it performs a duplicate check based on its business keys (e.g., employeeName and employeePosition).
+     * For other entities without an ID, it currently returns {@code false}.
      *
-     * @param object The entity to be checked for existence.
-     * @return {@code true} if it does exist, {@code false} otherwise.
+     * @param object the entity to be checked for existence.
+     * @return {@code true} if the object exists in the database; {@code false} otherwise.
      */
 
     private boolean isObjectInDB(T object) {
-        Optional<T> objectInDB = getObject(object.getID());
-        return objectInDB.isPresent();
+        if (object.getID() != null) {
+            Optional<T> optionalT = getObject(object.getID());
+            return optionalT.isPresent();
+        } else {
+            if (object instanceof HEmployee employee) {
+                Optional<HEmployee> duplicate = getDuplicate(employee);
+                return duplicate.isPresent();
+            }
+        }
+        return false;
     }
+
 
     /**
      * Stores a new entity in the database.
@@ -90,7 +102,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
         }
 
         T objectToUpdate = objectInDB.get();
-        Set<String> excludedFields = Set.of("id", "employeeList", "HDepartment"); // Exclude ID and relations
+        Set<String> excludedFields = Set.of("id", "employeesList", "HDepartment"); // Exclude ID and relations
 
         Optional<Field> fieldToUpdate = ObjectFieldsUtil.promptUserForFieldSelection(objectToUpdate, excludedFields);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
@@ -107,10 +119,10 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
             session.beginTransaction();
             session.flush();
             field.set(object, newValue);
-            session.merge(object); // Overwrites
 
             if (!ValidationUtil.isValidObject(object, clazz)) return Optional.empty();
 
+            session.merge(object); // Overwrites
             session.getTransaction().commit();
 
             System.out.println("Object successfully modified");
@@ -156,7 +168,7 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
         String clazzSimpleName = clazz.getSimpleName();
         String query =
                 "FROM " + clazzSimpleName + " o " +
-                "WHERE o.id = :id";
+                        "WHERE o.id = :id";
 
         try (Session session = dbManager.openSession()) {
             return Optional.ofNullable(session.createQuery(query, clazz)
@@ -188,6 +200,35 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
                     .getResultList();
         } catch (Exception e) {
             throw new DatabaseQueryException("Could not retrieve object list from Hibernate JPA", e);
+        }
+    }
+
+    /**
+     * Retrieves a duplicate HEmployee entity based on unique business keys.
+     * <p>
+     * This method queries the database for an HEmployee with the same employeeName and employeePosition.
+     * It is used to check for duplicates when the entity does not yet have an assigned ID.
+     *
+     * @param employee the HEmployee entity to check for duplicates.
+     * @return an {@code Optional<HEmployee>} containing the duplicate if found, or {@code Optional.empty()} otherwise.
+     * @throws DatabaseQueryException if an error occurs while querying the database.
+     */
+
+    private Optional<HEmployee> getDuplicate(HEmployee employee) {
+        String hql =
+                "FROM HEmployee e " +
+                "WHERE e.employeeName = :name " +
+                "AND e.employeePosition = :position";
+
+        try (Session session = dbManager.openSession()) {
+            HEmployee duplicate = session.createQuery(hql, HEmployee.class)
+                    .setParameter("name", employee.getEmployeeName())
+                    .setParameter("position", employee.getEmployeePosition())
+                    .setMaxResults(1)
+                    .uniqueResult();
+            return Optional.ofNullable(duplicate);
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Could not retrieve duplicate for employee " + employee.getEmployeeName(), e);
         }
     }
 }

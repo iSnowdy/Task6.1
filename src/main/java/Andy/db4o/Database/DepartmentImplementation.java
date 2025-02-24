@@ -27,6 +27,11 @@ public class DepartmentImplementation extends DB4OBaseImplementation<Department>
         super(Department.class, dbManager);
     }
 
+    @Override
+    public String getPrimaryKeyFieldName() {
+        return primaryFieldName;
+    }
+
     /**
      * Adds a new department to the database.
      * If it already exists, the insertion is then ignored.
@@ -58,7 +63,7 @@ public class DepartmentImplementation extends DB4OBaseImplementation<Department>
 
     @Override
     public Optional<Department> updateDepartment(Object id) {
-        return updateObject(id, primaryFieldName);
+        return updateObject(id);
     }
 
     /**
@@ -71,7 +76,7 @@ public class DepartmentImplementation extends DB4OBaseImplementation<Department>
 
     @Override
     public Optional<Department> deleteDepartment(Object id) {
-        Optional<Department> departmentOptional = getObject(id, primaryFieldName);
+        Optional<Department> departmentOptional = getObject(id);
         if (departmentOptional.isEmpty()) {
             System.out.println("Department " + id + " not found");
             return Optional.empty();
@@ -91,7 +96,7 @@ public class DepartmentImplementation extends DB4OBaseImplementation<Department>
 
     @Override
     public Optional<Department> findDepartmentByID(Object id) {
-        Optional<Department> departmentOptional = getObject(id, primaryFieldName);
+        Optional<Department> departmentOptional = getObject(id);
         if (departmentOptional.isEmpty()) {
             System.out.println("Department " + id + " not found");
             return Optional.empty();

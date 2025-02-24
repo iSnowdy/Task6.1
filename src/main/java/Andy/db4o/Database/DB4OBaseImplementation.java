@@ -38,15 +38,45 @@ public abstract class DB4OBaseImplementation<T> {
     }
 
     /**
-     * Checks if any given object exists in the db4o database.
+     * Returns the name of the primary key field for the entity.
+     * <p>
+     * This method must be implemented by each subclass to indicate which field acts as the primary key.
      *
-     * @param object Entity instance.
-     * @return {@code true} if exists, {@code false} otherwise.
+     * @return the name of the primary key field.
+     */
+
+    public abstract String getPrimaryKeyFieldName();
+
+    /**
+     * Checks if the given object exists in the db4o database based on its primary key.
+     * <p>
+     * This method uses the primary key field name obtained from {@link #getPrimaryKeyFieldName()}
+     * to retrieve the primary key value from the object. It then queries the database to determine
+     * whether an object with the same primary key value exists.
+     *
+     * @param object the entity instance to check.
+     * @return {@code true} if an object with the same primary key value exists in the database; {@code false} otherwise.
+     * @throws IllegalArgumentException if the primary key field cannot be accessed.
+     * @throws DatabaseQueryException   if an error occurs while querying the database.
      */
 
     private boolean isObjectInDB(T object) {
-        return !(dbManager.getDb4oContainer().queryByExample(object).isEmpty());
+        try {
+            String primaryFieldName = getPrimaryKeyFieldName();
+
+            Field field = object.getClass().getDeclaredField(primaryFieldName);
+            field.setAccessible(true);
+
+            Object primaryKeyValue = field.get(object);
+
+            return getObject(primaryKeyValue).isPresent();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalArgumentException("Could not access primary field");
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Could not check for existence in db4o");
+        }
     }
+
 
     /**
      * Stores an object in the db4o database if it does not exist already.
@@ -72,27 +102,24 @@ public abstract class DB4OBaseImplementation<T> {
      * Updates an object in the database based on user input.
      *
      * @param id The unique identifier (Department_ID, Employee_ID) of the object.
-     * @param primaryFieldName The name of the primary key field (ID).
      * @return An {@code Optional<T>} containing the updated object, or empty if it was not found or the update failed.
      */
 
-    protected Optional<T> updateObject(Object id, String primaryFieldName) {
-        Optional<T> objectOptional = getObject(id, primaryFieldName);
+    protected Optional<T> updateObject(Object id) {
+        Optional<T> objectOptional = getObject(id);
         if (objectOptional.isEmpty()) {
             System.out.println("Object with ID " + id + " could not be found.");
             return Optional.empty();
         }
 
         T objectToUpdate = objectOptional.get();
-        Set<String> excludedFields = Set.of("id"); // Exclude ID field from modification
+        Set<String> excludedFields = Set.of("departmentID", "employeeID", "department"); // Exclude ID field from modification
 
         Optional<Field> fieldToUpdate = ObjectFieldsUtil.promptUserForFieldSelection(objectToUpdate, excludedFields);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
         return modifyObjectField(objectToUpdate, fieldToUpdate.get());
     }
-
-    // TODO: Validate update value
 
     // Given the object to be updated, it asks the user for its new value and updates it. First it sets
     // the field to the new value and then stores it in db4o.
@@ -104,7 +131,8 @@ public abstract class DB4OBaseImplementation<T> {
 
             if (!ValidationUtil.isValidObject(object, clazz)) return Optional.empty();
 
-            storeObject(object);
+            // I do not call here my method because we can't validate repeated
+            dbManager.getDb4oContainer().store(object);
             dbManager.getDb4oContainer().commit();
             System.out.println("Object successfully updated");
             return Optional.ofNullable(object);
@@ -139,26 +167,26 @@ public abstract class DB4OBaseImplementation<T> {
     /**
      * Retrieves an object from the db4o database by its ID.
      *
-     * @param id             The unique ID of the object (which would be Employee/Department ID).
-     * @param fieldQueryName The name of the field to query (PK).
+     * @param id The unique ID of the object (which would be Employee/Department ID).
      * @return An {@code Optional<T>} containing the found object, or empty if it was not found.
      * @throws DatabaseQueryException if an error occurs while querying the database.
      */
 
-    protected Optional<T> getObject(Object id, String fieldQueryName) {
-        System.out.println("ID: " + id + " Query: " + fieldQueryName);
+    protected Optional<T> getObject(Object id) {
         try {
+            String primaryFieldName = getPrimaryKeyFieldName();
+
             Query query = dbManager.getDb4oContainer().query();
             // Obtain the class (Employee or Department)
             query.constrain(clazz);
-            query.descend(fieldQueryName).constrain(id);
+            query.descend(primaryFieldName).constrain(id);
 
             List<T> queryResults = query.execute();
 
             // If the query result is empty, returns an empty Optional. Otherwise, the first match
             return queryResults.isEmpty() ? Optional.empty() : Optional.ofNullable(queryResults.getFirst());
         } catch (Exception e) {
-            throw new DatabaseQueryException("Error querying single object. Field: " + fieldQueryName + " in db4o", e);
+            throw new DatabaseQueryException("Error querying single object in db4o", e);
         }
     }
 

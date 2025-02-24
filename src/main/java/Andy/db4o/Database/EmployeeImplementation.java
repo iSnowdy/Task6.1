@@ -27,6 +27,11 @@ public class EmployeeImplementation extends DB4OBaseImplementation<Employee> imp
         super(Employee.class, dbManager);
     }
 
+    @Override
+    public String getPrimaryKeyFieldName() {
+        return primaryFieldName;
+    }
+
     /**
      * Adds a new employee to the database.
      * If the employee already exists, the insertion is ignored.
@@ -52,7 +57,7 @@ public class EmployeeImplementation extends DB4OBaseImplementation<Employee> imp
 
     @Override
     public Optional<Employee> updateEmployee(Object id) {
-        return updateObject(id, primaryFieldName);
+        return updateObject(id);
     }
 
     /**
@@ -65,7 +70,7 @@ public class EmployeeImplementation extends DB4OBaseImplementation<Employee> imp
 
     @Override
     public boolean deleteEmployee(Object id) {
-        Optional<Employee> employeeOptional = getObject(id, primaryFieldName);
+        Optional<Employee> employeeOptional = getObject(id);
 
         if (employeeOptional.isEmpty()) {
             System.out.println("Employee " + id + " could not be found");
@@ -87,7 +92,7 @@ public class EmployeeImplementation extends DB4OBaseImplementation<Employee> imp
 
     @Override
     public Optional<Employee> findEmployeeByID(Object id) {
-        Optional<Employee> employeeOptional = getObject(id, primaryFieldName);
+        Optional<Employee> employeeOptional = getObject(id);
         if (employeeOptional.isEmpty()) {
             System.out.println("Employee " + id + " could not be found");
             return Optional.empty();

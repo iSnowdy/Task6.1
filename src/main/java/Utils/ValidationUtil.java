@@ -49,7 +49,7 @@ public class ValidationUtil {
     public static boolean isValidDepartmentName(String departmentNameToAnalyze) {
         if (departmentNameToAnalyze == null) return false;
         for (DepartmentNames departmentName : DepartmentNames.values()) {
-            if (departmentName.name().equals(departmentNameToAnalyze)) {
+            if (departmentName.getDepartmentNameAsString().equals(departmentNameToAnalyze)) {
                 return true;
             }
         }
@@ -131,7 +131,7 @@ public class ValidationUtil {
     public static boolean isValidEmployeePosition(String positionToAnalyze) {
         if (positionToAnalyze == null) return false;
         for (EmployeePosition employeePosition : EmployeePosition.values()) {
-            if (employeePosition.name().equals(positionToAnalyze)) {
+            if (employeePosition.getEmployeePositionAsString().equals(positionToAnalyze)) {
                 return true;
             }
         }
@@ -148,8 +148,6 @@ public class ValidationUtil {
     public static boolean isValidEmployeeId(int employeeID) {
         return employeeID > 0;
     }
-
-    // Needs testing
 
     /**
      * Validates an object of type {@code <T>}, determining its type automatically.

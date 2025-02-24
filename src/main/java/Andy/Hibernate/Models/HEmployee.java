@@ -2,6 +2,8 @@ package Andy.Hibernate.Models;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "empleado")
 public class HEmployee implements DatabaseEntity {
@@ -27,6 +29,22 @@ public class HEmployee implements DatabaseEntity {
         this.HDepartment = HDepartment;
     }
 
+    /**
+     * Overrides equals to check equality based on the primary key if available,
+     * or on a combination of business keys if not yet persisted.
+     */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HEmployee)) return false;
+
+        HEmployee employee = (HEmployee) o;
+        return
+                employee.employeeName.equals(employeeName) &&
+                employee.employeePosition.equals(employeePosition) &&
+                employee.HDepartment.getId().equals(HDepartment.getId());
+    }
 
     @Override
     public String toString() {
