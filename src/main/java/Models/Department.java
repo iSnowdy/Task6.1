@@ -1,7 +1,7 @@
 package Models;
 
 public class Department {
-    private final int departmentID; // PK
+    private int departmentID; // PK
     private String departmentName; // VARCHAR 14
     private String departmentAddress; // VARCHAR 13
 
@@ -10,6 +10,8 @@ public class Department {
         this.departmentName = departmentName;
         this.departmentAddress = departmentAddress;
     }
+
+    public Department() {}
 
 
     // Compares if the given object as parameter is the same as the one calling the method
@@ -39,6 +41,9 @@ public class Department {
     // Getters and Setters
     public int getDepartmentID() {
         return departmentID;
+    }
+    public void setDepartmentID(int departmentID) {
+        this.departmentID = departmentID;
     }
 
     public String getDepartmentName() {

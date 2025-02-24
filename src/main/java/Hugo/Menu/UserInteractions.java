@@ -1,8 +1,12 @@
 package Hugo.Menu;
 
-import Andy.db4o.Database.DatabaseManager;
+/*import Andy.db4o.Database.DatabaseManager;
 import Andy.db4o.Database.DepartmentImplementation;
-import Andy.db4o.Database.EmployeeImplementation;
+import Andy.db4o.Database.EmployeeImplementation;*/
+
+import Hugo.PostgreSQL.DatabaseManager;
+import Hugo.PostgreSQL.DepartmentImplementation;
+import Hugo.PostgreSQL.EmployeeImplementation;
 
 import Models.Department;
 import Models.Employee;

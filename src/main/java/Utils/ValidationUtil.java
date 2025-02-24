@@ -49,7 +49,7 @@ public class ValidationUtil {
     public static boolean isValidDepartmentName(String departmentNameToAnalyze) {
         if (departmentNameToAnalyze == null) return false;
         for (DepartmentNames departmentName : DepartmentNames.values()) {
-            if (departmentName.name().equals(departmentNameToAnalyze)) {
+            if (departmentName.name().equalsIgnoreCase(departmentNameToAnalyze)) {
                 return true;
             }
         }
