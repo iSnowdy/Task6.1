@@ -30,10 +30,10 @@ public class MainDB4O {
         departmentDAO = new DepartmentImplementation(databaseManager);
         employeeDAO = new EmployeeImplementation(databaseManager);
 
-        insertData();
-        queryData();
+        //insertData();
+        //queryData();
         updateData();
-        deleteData();
+        //deleteData();
         closeDatabase();
     }
 
@@ -71,11 +71,14 @@ public class MainDB4O {
             Employee employeeLopez = new Employee(2, "López", EmployeePosition.VENDEDOR.getEmployeePositionAsString(), 30, departmentVentas);
             Employee employeePerez = new Employee(3, "Pérez", EmployeePosition.VENDEDOR.getEmployeePositionAsString(), 30, departmentVentas);
             Employee employeeGomez = new Employee(4, "Gómez", EmployeePosition.RESPONSABLE.getEmployeePositionAsString(), 20, departmentMarketing);
+            Employee empTest1 = new Employee(4, "Juanito", EmployeePosition.VENDEDOR.getEmployeePositionAsString(), 30, departmentVentas);
 
             employeeDAO.addEmployee(employeeGarcia);
             employeeDAO.addEmployee(employeeLopez);
             employeeDAO.addEmployee(employeePerez);
             employeeDAO.addEmployee(employeeGomez);
+            System.out.println("AAAAA");
+            employeeDAO.addEmployee(empTest1);
 
             System.out.println("Insert completed successfully!");
         } catch (DatabaseInsertException e) {
@@ -111,16 +114,20 @@ public class MainDB4O {
 
     private static void updateData() {
         System.out.println("\nModifying Data...");
-
+        // Ventas -> Contabilidad
         try {
-            System.out.println("Modifying Department By ID:");
-            departmentDAO.updateDepartment(20);
+            System.out.println("Modifying Department By ID 30:");
+            System.out.println("Department name: " + departmentDAO.findDepartmentByID(30).get().getDepartmentName());
+            departmentDAO.updateDepartment(30);
             System.out.println("After modifying Department...");
-            System.out.println(departmentDAO.findDepartmentByID(10).orElseThrow(() -> new DatabaseQueryException("Department not found")));
+            System.out.println(departmentDAO.findDepartmentByID(30).orElseThrow(() -> new DatabaseQueryException("Department not found")));
+            System.out.println("Department name: " + departmentDAO.findDepartmentByID(30).get().getDepartmentName());
 
-            System.out.println("Modifying Employee By ID:");
+            System.out.println("Modifying Employee By ID 1:");
+            System.out.println("Employee Name: " + employeeDAO.findEmployeeByID(1).get().getEmployeeName());
             employeeDAO.updateEmployee(1);
             System.out.println("After modifying Employee...");
+            System.out.println("Employee Name: " + employeeDAO.findEmployeeByID(1).get().getEmployeeName());
             System.out.println(employeeDAO.findEmployeeByID(1).orElseThrow(() -> new DatabaseQueryException("Employee not found")));
 
         } catch (DatabaseQueryException e) {

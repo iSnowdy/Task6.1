@@ -2,6 +2,8 @@ package Andy.Hibernate.Database;
 
 import Andy.Hibernate.Models.HEmployee;
 import DAO.Interfaces.HibernateInterfaces.HEmployeeDAO;
+import Exceptions.DatabaseQueryException;
+import org.hibernate.Session;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +39,8 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
     @Override
     public void addEmployee(HEmployee employee) {
         if (storeObject(employee))
-            System.out.println("Employee ID " + employee.getID() + " was added to the Hibernate JPA DB");
-        else System.out.println("Employee ID " + employee.getID() + "could not be added to the Hibernate JPA DB");
+            System.out.println("Employee " + employee.getEmployeeName() + " was added to the Hibernate JPA DB");
+        else System.out.println("Employee " + employee.getEmployeeName() + " could not be added to the Hibernate JPA DB");
     }
 
     /**
