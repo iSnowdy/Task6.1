@@ -15,13 +15,16 @@ public class Employee {
         this.department = department;
     }
 
-    // TODO: Only for testing purposes. Delete this later on
     public Employee(int employeeID, String employeeName, String employeePosition, int departmentID, Department department) {
         this.employeeID = employeeID;
         this.employeeName = employeeName;
         this.employeePosition = employeePosition;
         this.departmentID = departmentID;
         this.department = department;
+    }
+
+    public Employee() {
+
     }
 
     // Compares if the given object as parameter is the same as the one calling the method
