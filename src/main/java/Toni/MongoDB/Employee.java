@@ -13,7 +13,7 @@ public class Employee extends Models.Employee {
 
 
     @BsonId
-    private ObjectId employe_ID;
+    private ObjectId employee_ID;
     @BsonProperty("id")
     private int employeeID; // FK auto-generated
     @BsonProperty("name")
@@ -42,6 +42,15 @@ public class Employee extends Models.Employee {
         this.department = (Department) employee.getDepartment();
     }
 
+    public Employee(Document doc) {
+        this.employee_ID = doc.getObjectId("_id");
+        this.employeeID = doc.getInteger("id");
+        this.employeeName = doc.getString("name");
+        this.employeePosition = doc.getString("position");
+        this.department = doc.get("department",Department.class);
+    }
+
+
 
 
     // Compares if the given object as parameter is the same as the one calling the method
@@ -68,7 +77,7 @@ public class Employee extends Models.Employee {
     }
 
     public Document toDocument(){
-        return new Document("_id",employe_ID)
+        return new Document("_id",employee_ID)
                 .append("id",employeeID)
                 .append("name",employeeName)
                 .append("position",employeePosition);
