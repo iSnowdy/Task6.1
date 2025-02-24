@@ -95,4 +95,39 @@ public class DatabaseManager {
         }
         return departmentsDoc;
     }
+    public boolean deleteEmployee(int id) {
+        Document filtro = new Document("id", id);
+        return getCollection(Constants.EMPLOYEE_COLLECTION).deleteOne(eq(filtro)).getDeletedCount() > 0;
+    }
+
+
+    public Document getEmployeeDocById(int id){
+        MongoCollection<Document> equiposCollection = getCollection(Constants.EMPLOYEE_COLLECTION);
+        Document query = new Document("id",id);
+        return equiposCollection.find(query).first();
+    }
+
+    public void updateEmployee(int id, String name, String position, Department department ){
+        Document query = new Document("id", id); //eq()
+        Document update = new Document(); // set()
+        if (!name.isEmpty()){
+            update.append("name", position);
+        }
+        if (!position.isEmpty()) {
+            update.append("position", name);
+        }
+        if (department != null) {
+            update.append("department", department.toDocument());
+        }
+        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(eq(query), update);
+
+    }
+    public List<Document> getAllEmlpoyees(){
+        MongoCollection<Document> departmentCollection = getCollection(Constants.EMPLOYEE_COLLECTION);
+        List<Document> employeesDoc = new ArrayList<>();
+        for (Document employeeDoc: departmentCollection.find()){
+            employeesDoc.add(employeeDoc);
+        }
+        return employeesDoc;
+    }
 }
