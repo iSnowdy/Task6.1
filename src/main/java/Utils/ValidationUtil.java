@@ -90,7 +90,6 @@ public class ValidationUtil {
         if (employee == null) return false;
         return isValidEmployeeName(employee.getEmployeeName()) &&
                 isValidEmployeePosition(employee.getEmployeePosition()) &&
-                isValidEmployeeId(employee.getEmployeeID()) &&
                 isValidDepartmentId(employee.getDepartmentID()); // Ensure department exists
     }
 
@@ -131,7 +130,7 @@ public class ValidationUtil {
     public static boolean isValidEmployeePosition(String positionToAnalyze) {
         if (positionToAnalyze == null) return false;
         for (EmployeePosition employeePosition : EmployeePosition.values()) {
-            if (employeePosition.name().equals(positionToAnalyze)) {
+            if (employeePosition.getEmployeePositionAsString().equals(positionToAnalyze)) {
                 return true;
             }
         }

@@ -20,9 +20,9 @@ public class EmployeeImplementation extends PostgreBaseImplementation<Employee> 
     @Override
     public void addEmployee(Employee employee) {
         if (storePostgreEmployee(employee)) {
-            System.out.println("Employee " + employee.getEmployeeID() + " successfully added");
+            System.out.println("Employee successfully added");
         } else {
-            System.out.println("Employee " + employee.getEmployeeID() + " could not be added");
+            System.out.println("Employee could not be added");
         }
     }
 

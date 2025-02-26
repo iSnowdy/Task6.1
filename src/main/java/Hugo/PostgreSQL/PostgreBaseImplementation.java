@@ -161,22 +161,19 @@ public abstract class PostgreBaseImplementation<T> {
     }
 
     public boolean storePostgreEmployee(Employee employee) {
-        if (!isEmployeeInDB(employee)) {
-            String query = "INSERT INTO employee (empno, nombre, puesto, depno) VALUES (?, ?, ?, ?)";
-            try {
-                Connection connection = dbManager.getConnection();
-                PreparedStatement pstmt = connection.prepareStatement(query);
-                pstmt.setInt(1, employee.getEmployeeID());
-                pstmt.setString(2, employee.getEmployeeName());
-                pstmt.setString(3, employee.getEmployeePosition());
-                pstmt.setInt(4, employee.getEmployeeID());
-                int rowsAffected = pstmt.executeUpdate();
-                return rowsAffected > 0;
-            } catch (SQLException e) {
-                throw new DatabaseInsertException("Could not store the department in PostgreSQL", e);
-            }
+        String query = "INSERT INTO employee (nombre, puesto, depno) VALUES (?,?,?)";
+        try {
+            Connection connection = dbManager.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setString(1, employee.getEmployeeName());
+            pstmt.setString(2, employee.getEmployeePosition());
+            pstmt.setInt(3, employee.getDepartmentID());
+            System.out.println(pstmt.toString());
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            throw new DatabaseInsertException("Could not store the employee in PostgreSQL", e);
         }
-        return false;
     }
 
     private boolean isEmployeeInDB(Employee employee) {
