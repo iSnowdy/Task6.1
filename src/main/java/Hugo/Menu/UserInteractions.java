@@ -109,6 +109,7 @@ public class UserInteractions {
         if (optionalDepartment.isPresent()) {
             Department employeeDepartment = optionalDepartment.get();
             Employee employeeInput = new Employee(name, position, id, employeeDepartment);
+            System.out.println(employeeInput);
             if(ValidationUtil.isValidObject(employeeInput, Employee.class)) {
                 employee.addEmployee(employeeInput);
                 System.out.println("Employee created!");
