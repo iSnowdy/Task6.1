@@ -1,27 +1,46 @@
 package Toni.MongoDB;
 
-import DAO.Interfaces.DepartmentDAO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
+
 import org.bson.Document;
 
-import java.util.*;
+import DAO.Interfaces.DepartmentDAO;
 
+/**
+ * Implementation of DepartmentDAO interface for MongoDB.
+ */
 public class DepartmentImplementation implements DepartmentDAO {
     private DatabaseManager dbAccess;
     private final Scanner scanner;
 
-
+    /**
+     * Constructor initializes DatabaseManager and Scanner.
+     */
     public DepartmentImplementation() {
         dbAccess = new DatabaseManager();
         scanner = new Scanner(System.in);
     }
 
+    /**
+     * Adds a new department to the database.
+     * @param department The department to add.
+     * @return True if the department was added, false otherwise.
+     */
     @Override
     public boolean addDepartment(Models.Department department) {
         Department dep = new Department(department);
         return dbAccess.saveDepartament(dep);
     }
 
-
+    /**
+     * Updates an existing department in the database.
+     * @param id The ID of the department to update.
+     * @return An Optional containing the updated department, if found.
+     */
     @Override
     public Optional<Models.Department> updateDepartment(Object id) {
         Optional<Models.Department> result = Optional.empty();
@@ -33,6 +52,11 @@ public class DepartmentImplementation implements DepartmentDAO {
         }
         return result;
     }
+
+    /**
+     * Prompts the user for values to update a department.
+     * @return A map of the values to update.
+     */
     private Map<String,String> getValuesToUpdate(){
         boolean setted = false;
         String nameScanned ="";
@@ -50,6 +74,11 @@ public class DepartmentImplementation implements DepartmentDAO {
         return Map.of("name",nameScanned,"address",addressScanned);
     }
 
+    /**
+     * Deletes a department from the database.
+     * @param id The ID of the department to delete.
+     * @return An Optional containing the deleted department, if found.
+     */
     @Override
     public Optional<Models.Department> deleteDepartment(Object id) {
         Optional<Models.Department> result = Optional.empty();
@@ -62,6 +91,11 @@ public class DepartmentImplementation implements DepartmentDAO {
         return result;
     }
 
+    /**
+     * Finds a department by ID.
+     * @param id The ID of the department to find.
+     * @return An Optional containing the found department, if any.
+     */
     @Override
     public Optional<Models.Department> findDepartmentByID(Object id) {
         Optional<Models.Department> result = Optional.empty();
@@ -73,6 +107,10 @@ public class DepartmentImplementation implements DepartmentDAO {
         return result;
     }
 
+    /**
+     * Finds all departments in the database.
+     * @return A list of all departments.
+     */
     @Override
     public List<Models.Department> findAllDepartments() {
         List<Models.Department> departmentList = new ArrayList<>();

@@ -1,21 +1,37 @@
 package Toni.MongoDB;
 
-import DAO.Interfaces.EmployeeDAO;
-import Utils.ValidationUtil;
-import com.mongodb.client.MongoCollection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
+
 import org.bson.Document;
 
-import java.util.*;
+import com.mongodb.client.MongoCollection;
 
+import DAO.Interfaces.EmployeeDAO;
+import Utils.ValidationUtil;
+
+/**
+ * Implementation of EmployeeDAO interface for MongoDB.
+ */
 public class EmployeeImplementation implements EmployeeDAO {
     private DatabaseManager dbAccess;
     private final Scanner scanner;
 
+    /**
+     * Constructor initializes DatabaseManager and Scanner.
+     */
     public EmployeeImplementation() {
         dbAccess = new DatabaseManager();
         scanner = new Scanner(System.in);
     }
 
+    /**
+     * Adds a new employee to the database.
+     * @param employee The employee to add.
+     */
     @Override
     public void addEmployee(Models.Employee employee) {
         MongoCollection<Document> equiposCollection = dbAccess.getCollection("departamento");
@@ -23,7 +39,11 @@ public class EmployeeImplementation implements EmployeeDAO {
         equiposCollection.insertOne(dep.toDocument());
     }
 
-
+    /**
+     * Updates an existing employee in the database.
+     * @param id The ID of the employee to update.
+     * @return An Optional containing the updated employee, if found.
+     */
     @Override
     public Optional<Models.Employee> updateEmployee(Object id) {
         Optional<Models.Employee> result = Optional.empty();
@@ -37,6 +57,11 @@ public class EmployeeImplementation implements EmployeeDAO {
         return result;
     }
 
+    /**
+     * Deletes an employee from the database.
+     * @param id The ID of the employee to delete.
+     * @return True if the employee was deleted, false otherwise.
+     */
     @Override
     public boolean deleteEmployee(Object id) {
         boolean result = false;
@@ -47,6 +72,11 @@ public class EmployeeImplementation implements EmployeeDAO {
         return result;
     }
 
+    /**
+     * Finds an employee by ID.
+     * @param id The ID of the employee to find.
+     * @return An Optional containing the found employee, if any.
+     */
     @Override
     public Optional<Models.Employee> findEmployeeByID(Object id) {
         Optional<Models.Employee> result = Optional.empty();
@@ -58,6 +88,10 @@ public class EmployeeImplementation implements EmployeeDAO {
         return result;
     }
 
+    /**
+     * Finds all employees in the database.
+     * @return A list of all employees.
+     */
     @Override
     public List<Models.Employee> findAllEmployees() {
         List<Models.Employee> departmentList = new ArrayList<>();
@@ -68,6 +102,10 @@ public class EmployeeImplementation implements EmployeeDAO {
         return departmentList;
     }
 
+    /**
+     * Prompts the user for values to update an employee.
+     * @return A map of the values to update.
+     */
     private Map<String,String> getValuesToUpdate(){
         boolean setted = false;
         String nameScanned ="";
