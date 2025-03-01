@@ -1,7 +1,6 @@
 package Toni.MongoDB;
 
 
-import jakarta.persistence.Column;
 import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -66,14 +65,15 @@ public class Employee extends Models.Employee {
     @Override
     public String toString() {
         return
-                "-----------------------\n" +
-                "Employee Information\n" +
-                "-----------------------\n" +
-                "Employee ID: " + employeeID + "\n" +
-                "Employee Name: " + employeeName + "\n" +
-                "Employee Position: " + employeePosition + "\n" +
-                "Department: " + department + "\n" +
-                "-----------------------\n";
+                """
+                -----------------------
+                Employee Information
+                -----------------------
+                Employee ID: %d \n
+                Employee Name: %s \n
+                Employee Position: %s \n
+                Department: %s \n
+                -----------------------\n""".formatted(getEmployeeID(),getEmployeeName(),getEmployeePosition(), getDepartment());
     }
 
     public Document toDocument(){

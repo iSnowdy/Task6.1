@@ -4,7 +4,7 @@ package Models;
 import java.util.Scanner;
 
 public class Employee {
-    private int employeeID; // FK auto-generated
+    private int employeeID; // PK auto-generated
     private String employeeName;
     private String employeePosition;
 
