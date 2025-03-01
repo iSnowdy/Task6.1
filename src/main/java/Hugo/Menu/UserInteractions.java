@@ -1,8 +1,12 @@
 package Hugo.Menu;
 
-import Andy.db4o.Database.DatabaseManager;
+/*import Andy.db4o.Database.DatabaseManager;
 import Andy.db4o.Database.DepartmentImplementation;
-import Andy.db4o.Database.EmployeeImplementation;
+import Andy.db4o.Database.EmployeeImplementation;*/
+
+import Hugo.PostgreSQL.DatabaseManager;
+import Hugo.PostgreSQL.DepartmentImplementation;
+import Hugo.PostgreSQL.EmployeeImplementation;
 
 import Models.Department;
 import Models.Employee;
@@ -105,6 +109,7 @@ public class UserInteractions {
         if (optionalDepartment.isPresent()) {
             Department employeeDepartment = optionalDepartment.get();
             Employee employeeInput = new Employee(name, position, id, employeeDepartment);
+            System.out.println(employeeInput);
             if(ValidationUtil.isValidObject(employeeInput, Employee.class)) {
                 employee.addEmployee(employeeInput);
                 System.out.println("Employee created!");

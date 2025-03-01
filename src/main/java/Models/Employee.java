@@ -15,14 +15,6 @@ public class Employee {
         this.department = department;
     }
 
-    public Employee(int employeeID, String employeeName, String employeePosition, int departmentID, Department department) {
-        this.employeeID = employeeID;
-        this.employeeName = employeeName;
-        this.employeePosition = employeePosition;
-        this.departmentID = departmentID;
-        this.department = department;
-    }
-
     public Employee() {
 
     }
