@@ -1,5 +1,7 @@
 package Utils;
 
+import Exceptions.DatabaseUpdateException;
+
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -29,8 +31,15 @@ public class ObjectFieldsUtil {
         printFieldOptions(selectableFields);
 
         System.out.print("Enter the number of the field you want to modify: ");
-        int fieldIndex = scanner.nextInt();
-        scanner.nextLine(); // Consume buffer
+
+        int fieldIndex;
+        try {
+            fieldIndex = scanner.nextInt();
+            scanner.nextLine(); // Consume buffer
+        } catch (InputMismatchException e) {
+            System.out.println("Please enter an integer. Returning...");
+            throw new DatabaseUpdateException("Input mismatch");
+        }
 
         return validateAndReturnField(selectableFields, fieldIndex);
     }

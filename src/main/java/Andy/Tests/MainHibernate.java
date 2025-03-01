@@ -36,9 +36,9 @@ public class MainHibernate {
             System.out.println(eImpl.findEmployeeByID(18).get());*/
 
             insertData();
-            queryData();
-            updateData();
-            deleteData();
+            //queryData();
+            //updateData();
+            //deleteData();
 
             databaseManager.closeDB();
         } catch (DatabaseException e) {
@@ -51,6 +51,7 @@ public class MainHibernate {
         System.out.println("\nInserting data...");
         try {
             // Departments
+            System.out.println("Department size BEFORE: " + dImpl.findAllDepartments().size());
             HDepartment department1 = new HDepartment(1, DepartmentNames.CONTABILIDAD.getDepartmentNameAsString(), "Madrid");
             HDepartment department2 = new HDepartment(2, DepartmentNames.MARKETING.getDepartmentNameAsString(), "Barcelona");
             HDepartment department3 = new HDepartment(3, DepartmentNames.VENTAS.getDepartmentNameAsString(), "Alicante");
@@ -61,7 +62,10 @@ public class MainHibernate {
             dImpl.addDepartment(department3);
             dImpl.addDepartment(department4);
 
+            System.out.println("Department size AFTER: " + dImpl.findAllDepartments().size());
+
             // Employees
+            System.out.println("Employee size BEFORE: " + eImpl.findAllEmployees().size());
             HEmployee employee1 = new HEmployee("Juan", EmployeePosition.ANALISTA.getEmployeePositionAsString(), department1);
             HEmployee employee2 = new HEmployee("María", EmployeePosition.VENDEDOR.getEmployeePositionAsString(), department2);
             HEmployee employee3 = new HEmployee("Carlos", EmployeePosition.RESPONSABLE.getEmployeePositionAsString(), department3);
@@ -71,6 +75,8 @@ public class MainHibernate {
             eImpl.addEmployee(employee2);
             eImpl.addEmployee(employee3);
             eImpl.addEmployee(employee4);
+
+            System.out.println("Employee size AFTER: " + eImpl.findAllEmployees().size());
         } catch (DatabaseInsertException e) {
             e.printStackTrace();
         }
@@ -98,6 +104,8 @@ public class MainHibernate {
 
     public static void updateData() {
         System.out.println("\nUpdating data...");
+        // Contabilidad -> Ventas
+        // Juanito -> Pablito
         try {
             System.out.println("Modifying Department...");
             System.out.println(dImpl.findDepartmentByID(1).get());
@@ -106,7 +114,7 @@ public class MainHibernate {
 
 
             System.out.println("Modifying Employee...");
-            System.out.println(eImpl.findEmployeeByID(17));
+            System.out.println(eImpl.findEmployeeByID(17).get());
             eImpl.updateEmployee(17);
             System.out.println(eImpl.findEmployeeByID(17).get());
         } catch (DatabaseQueryException e) {
