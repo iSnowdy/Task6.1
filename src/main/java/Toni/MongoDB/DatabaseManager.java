@@ -1,29 +1,42 @@
 package Toni.MongoDB;
 
-import Exceptions.DatabaseOpeningException;
-import Utils.Constants;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
+
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.mongodb.client.model.Filters.eq;
 
+import Exceptions.DatabaseOpeningException;
+import Utils.Constants;
+
+/**
+ * Manages the connection and operations with the MongoDB database.
+ */
 public class DatabaseManager {
     private MongoDatabase db;
     private MongoClient mongoClient;
+
+    /**
+     * Constructs a DatabaseManager and opens the database connection.
+     */
     public DatabaseManager() {
         openDb();
     }
+
+    /**
+     * Opens the connection to the MongoDB database.
+     * @throws DatabaseOpeningException if there is an error opening the database.
+     */
     public void openDb(){
         try {
             // Acceder a una base de datos
@@ -44,20 +57,38 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Closes the connection to the MongoDB database.
+     */
     public void closeDb(){
         mongoClient.close();
     }
 
+    /**
+     * Retrieves a collection from the database.
+     * @param collectionName the name of the collection to retrieve.
+     * @return the MongoCollection object.
+     */
     public MongoCollection<Document> getCollection(String collectionName){
         return db.getCollection(collectionName);
     }
 
+    /**
+     * Retrieves a department document by its ID.
+     * @param id the ID of the department.
+     * @return the department document.
+     */
     public Document getDepartamentDoc(int id){
         MongoCollection<Document> equiposCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
         Document query = new Document("id",id);
         return equiposCollection.find(query).first();
     }
 
+    /**
+     * Saves a department to the database.
+     * @param department the department to save.
+     * @return true if the department was saved successfully, false otherwise.
+     */
     public boolean saveDepartament(Department department){
         boolean result = false;
         MongoCollection<Document> depatmentCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
@@ -68,6 +99,12 @@ public class DatabaseManager {
         return result;
     }
 
+    /**
+     * Updates a department's name and/or address.
+     * @param id the ID of the department.
+     * @param name the new name of the department.
+     * @param address the new address of the department.
+     */
     public void updateDepartment(int id, String name, String address ){
         Document query = new Document("id", id); //eq()
         Document update; // set()
@@ -82,11 +119,19 @@ public class DatabaseManager {
 
     }
 
+    /**
+     * Deletes a department by its ID.
+     * @param id the ID of the department to delete.
+     */
     public void deleteDepartamento(int id) {
         Document filtro = new Document("id", id);
         getCollection(Constants.DEPARTMENT_COLLECTION).deleteOne(eq(filtro));
     }
 
+    /**
+     * Retrieves all department documents from the database.
+     * @return a list of all department documents.
+     */
     public List<Document> getAllDepartments(){
         MongoCollection<Document> departmentCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
         List<Document> departmentsDoc = new ArrayList<>();
@@ -95,21 +140,38 @@ public class DatabaseManager {
         }
         return departmentsDoc;
     }
+
+    /**
+     * Deletes an employee by its ID.
+     * @param id the ID of the employee to delete.
+     * @return true if the employee was deleted successfully, false otherwise.
+     */
     public boolean deleteEmployee(int id) {
         Document filtro = new Document("id", id);
         return getCollection(Constants.EMPLOYEE_COLLECTION).deleteOne(eq(filtro)).getDeletedCount() > 0;
     }
 
-
+    /**
+     * Retrieves an employee document by its ID.
+     * @param id the ID of the employee.
+     * @return the employee document.
+     */
     public Document getEmployeeDocById(int id){
         MongoCollection<Document> equiposCollection = getCollection(Constants.EMPLOYEE_COLLECTION);
         Document query = new Document("id",id);
         return equiposCollection.find(query).first();
     }
 
+    /**
+     * Updates an employee's name, position, and/or department.
+     * @param id the ID of the employee.
+     * @param name the new name of the employee.
+     * @param position the new position of the employee.
+     * @param department the new department of the employee.
+     */
     public void updateEmployee(int id, String name, String position, Department department ){
-        Document query = new Document("id", id); //eq()
-        Document update = new Document(); // set()
+        Document query = new Document("id", id); 
+        Document update = new Document();
         if (!name.isEmpty()){
             update.append("name", position);
         }
@@ -122,6 +184,11 @@ public class DatabaseManager {
         getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(eq(query), update);
 
     }
+
+    /**
+     * Retrieves all employee documents from the database.
+     * @return a list of all employee documents.
+     */
     public List<Document> getAllEmlpoyees(){
         MongoCollection<Document> departmentCollection = getCollection(Constants.EMPLOYEE_COLLECTION);
         List<Document> employeesDoc = new ArrayList<>();
