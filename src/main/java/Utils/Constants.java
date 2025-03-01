@@ -2,6 +2,11 @@ package Utils;
 
 public class Constants {
     //PLAiN TEXT
+    public static final String FILE_PATH = "src/main/resources";
+    public static final String FILE_NAME = "%s/estructuraFichero.txt".formatted(FILE_PATH);
+    public static final String ENTITY_DEPARTMENT = "departments";
+    public static final String ENTITY_EMPLOYEE = "employees";
+
     //RELATIONAL
     //HIBERNATE
     //DB4O CONSTANTS
