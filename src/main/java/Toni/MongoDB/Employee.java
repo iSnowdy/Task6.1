@@ -20,25 +20,28 @@ public class Employee extends Models.Employee {
     @BsonProperty("position")
     private String employeePosition;
 
-    private Department department; // FK references Department
+    private int departmentID; // FK references Department
 
     public Employee(String employeeName, String employeePosition, Department department) {
+        this.employee_ID = new ObjectId();
         this.employeeName = employeeName;
         this.employeePosition = employeePosition;
-        this.department = department;
     }
 
-    public Employee(int employeeID, String employeeName, String employeePosition, Department department) {
-        this.employeeID = employeeID;
-        this.employeeName = employeeName;
-        this.employeePosition = employeePosition;
-        this.department = department;
-    }
+//    public Employee(int employeeID, String employeeName, String employeePosition, Department department) {
+//        this.employee_ID = new ObjectId();
+//        this.employeeID = employeeID;
+//        this.employeeName = employeeName;
+//        this.employeePosition = employeePosition;
+//        this.departmentID = department;
+//    }
+
     public Employee(Models.Employee employee) {
+        this.employee_ID = new ObjectId();
         this.employeeID = employee.getEmployeeID();
         this.employeeName = employee.getEmployeeName();
         this.employeePosition = employee.getEmployeePosition();
-        this.department = (Department) employee.getDepartment();
+        this.departmentID = employee.getDepartmentID();
     }
 
     public Employee(Document doc) {
@@ -46,7 +49,6 @@ public class Employee extends Models.Employee {
         this.employeeID = doc.getInteger("id");
         this.employeeName = doc.getString("name");
         this.employeePosition = doc.getString("position");
-        this.department = doc.get("department",Department.class);
     }
 
 
@@ -72,8 +74,8 @@ public class Employee extends Models.Employee {
                 Employee ID: %d \n
                 Employee Name: %s \n
                 Employee Position: %s \n
-                Department: %s \n
-                -----------------------\n""".formatted(getEmployeeID(),getEmployeeName(),getEmployeePosition(), getDepartment());
+                Department ID: %s \n
+                -----------------------\n""".formatted(getEmployeeID(),getEmployeeName(),getEmployeePosition(), getDepartmentID());
     }
 
     public Document toDocument(){
@@ -106,10 +108,11 @@ public class Employee extends Models.Employee {
         this.employeePosition = employeePosition;
     }
 
-    public Department getDepartment() {
-        return department;
+    public int getDepartmentID() {
+        return departmentID;
     }
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setDepartmentID(int departmentID) {
+        this.departmentID = departmentID;
     }
+
 }
