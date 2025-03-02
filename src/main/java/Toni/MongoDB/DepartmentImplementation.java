@@ -100,6 +100,7 @@ public class DepartmentImplementation implements DepartmentDAO {
     public Optional<Models.Department> findDepartmentByID(Object id) {
         Optional<Models.Department> result = Optional.empty();
         Document depDoc = dbAccess.getDepartamentDoc((int)id);
+        System.out.println(depDoc);
         if (depDoc != null){
             result = Optional.of(new Department(depDoc));
         }

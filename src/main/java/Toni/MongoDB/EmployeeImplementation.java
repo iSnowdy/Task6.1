@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
+import Utils.Constants;
 import org.bson.Document;
 
 import com.mongodb.client.MongoCollection;
@@ -34,9 +35,11 @@ public class EmployeeImplementation implements EmployeeDAO {
      */
     @Override
     public void addEmployee(Models.Employee employee) {
-        MongoCollection<Document> equiposCollection = dbAccess.getCollection("departamento");
-        Employee dep = new Employee(employee);
-        equiposCollection.insertOne(dep.toDocument());
+        int lastId = findAllEmployees().size();
+        MongoCollection<Document> equiposCollection = dbAccess.getCollection(Constants.EMPLOYEE_COLLECTION);
+        Employee emp = new Employee(employee);
+        emp.setEmployeeID(lastId+1);
+        equiposCollection.insertOne(emp.toDocument());
     }
 
     /**
@@ -113,16 +116,13 @@ public class EmployeeImplementation implements EmployeeDAO {
         String departmentScanned ="";
         List<Document> allDep = dbAccess.getAllDepartments();
         do {
-            System.out.println("%n Text can be empty if won't want to be update");
-            System.out.println("Type here the new name: ");
-            nameScanned = scanner.next();
-            System.out.println("%n Type here the position: ");
-            positionScanned = scanner.next();
-            System.out.println("%n Type here future Department from this choice using index: ");
+            nameScanned = setValidEmployeeName();
+            positionScanned = setValidEmployeePosition();
+            System.out.println("Type here future Department from this choice using index: ");
             for (Document dep : allDep){
                 System.out.printf("%n| %s: %s", dep.get("id"),dep.get("name"));
             }
-            departmentScanned = scanner.next();
+            departmentScanned = String.valueOf(setValidDepartmentId(allDep));
             if (ValidationUtil.isValidDepartmentId(Integer.parseInt(departmentScanned)) &&
                 ValidationUtil.isValidEmployeeName(nameScanned) &&
                 ValidationUtil.isValidEmployeePosition(positionScanned)){
@@ -133,4 +133,75 @@ public class EmployeeImplementation implements EmployeeDAO {
         }while(!setted);
         return Map.of("name",nameScanned,"position",positionScanned, "department",departmentScanned);
     }
+
+    private String getTextScanned(String textToPrint) {
+        System.out.println(textToPrint);
+        return scanner.next();
+    }
+
+    private String setValidEmployeeName(){
+        String name;
+        boolean done = false;
+        do {
+            name = getTextScanned("Set employee Name: ");
+            if (ValidationUtil.isValidEmployeeName(name)) {
+                done = true;
+            }else{
+                System.out.println("Employee name must be Valid");
+            }
+        }while (!done);
+        return name;
+    }
+    private String setValidEmployeePosition(){
+        String position;
+        boolean done = false;
+        do {
+            position = getTextScanned("Set employee position: ");
+            if (ValidationUtil.isValidEmployeePosition(position)) {
+                done = true;
+            }else{
+                System.out.println("Employee position must be Valid");
+            }
+        }while (!done);
+        return position;
+    }
+
+    private String setValidDepId(){
+        String id;
+        boolean done = false;
+        do {
+            id = getTextScanned("Set department ID: ");
+            try {
+                if (ValidationUtil.isValidDepartmentId(Integer.parseInt(id))) {
+                    done = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Department ID must be a number");
+            }
+        }while (!done);
+        return id;
+    }
+
+    private int setValidDepartmentId(List<Document> departmentDocList){
+        List<Department> departmentList = new ArrayList<>();
+        for (Document doc : departmentDocList){
+            departmentList.add(new Department(doc));
+        }
+        int id;
+        boolean done = false;
+        do {
+            departmentList.forEach(System.out::println);
+            id = Integer.parseInt(setValidDepId());
+            int finalId = id;
+            if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {
+                System.out.println("Department with id: "+id+" not found!");
+            }
+            else {
+                done = true;
+            }
+        } while (!done);
+        return id;
+    }
+
+
 }
