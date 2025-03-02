@@ -17,14 +17,14 @@ import Utils.ValidationUtil;
  * Implementation of EmployeeDAO interface for MongoDB.
  */
 public class EmployeeImplementation implements EmployeeDAO {
-    private DatabaseManager dbAccess;
+    private final DatabaseManager dbAccess;
     private final Scanner scanner;
 
     /**
      * Constructor initializes DatabaseManager and Scanner.
      */
-    public EmployeeImplementation() {
-        dbAccess = new DatabaseManager();
+    public EmployeeImplementation(DatabaseManager databaseManager) {
+        dbAccess = databaseManager;
         scanner = new Scanner(System.in);
     }
 
