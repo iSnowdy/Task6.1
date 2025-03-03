@@ -69,7 +69,6 @@ public class UserInteractions {
         scan.nextLine();
         if (ValidationUtil.isValidDepartmentId(id)) {
             department.deleteDepartment(id);
-            System.out.println("Department with id: "+id+" deleted!");
         } else {
             System.out.println("Department ID is not valid");
         }

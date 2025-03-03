@@ -1,7 +1,6 @@
 package Hugo.PostgreSQL;
 
 import DAO.Interfaces.EmployeeDAO;
-import Models.Department;
 import Models.Employee;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public class EmployeeImplementation extends PostgreBaseImplementation<Employee> 
             return false;
         }
 
-        deletePostgreDepartment(employeeOptional.get());
+        deletePostgreEmployee(employeeOptional.get());
         return true;
     }
 
