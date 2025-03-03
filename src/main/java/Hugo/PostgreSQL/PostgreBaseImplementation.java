@@ -106,12 +106,27 @@ public abstract class PostgreBaseImplementation<T> {
 
     public boolean deletePostgreDepartment(Department department) {
         if (isDepartmentInDB(department)) {
-            String query = "DELETE FROM department WHERE depno = ?";
+            String checkEmployeesQuery = "SELECT COUNT(*) AS employee_count FROM employee WHERE depno = ?";
             try (Connection connection = dbManager.getConnection();
-                 PreparedStatement pstmt = connection.prepareStatement(query)) {
-                pstmt.setInt(1, department.getDepartmentID());
-                pstmt.executeUpdate();
-                return true;
+                 PreparedStatement checkStmt = connection.prepareStatement(checkEmployeesQuery)) {
+                checkStmt.setInt(1, department.getDepartmentID());
+                ResultSet rs = checkStmt.executeQuery();
+
+                if (rs.next()) {
+                    int employeeCount = rs.getInt("employee_count");
+                    if (employeeCount > 0) {
+                        System.out.println("The department cannot be deleted because it has employees assigned to it");
+                        return false;
+                    }
+                }
+
+                String deleteQuery = "DELETE FROM department WHERE depno = ?";
+                try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+                    deleteStmt.setInt(1, department.getDepartmentID());
+                    int rowsAffected = deleteStmt.executeUpdate();
+                    System.out.println("Department successfully deleted");
+                    return rowsAffected > 0;
+                }
             } catch (SQLException e) {
                 throw new DatabaseDeleteException("Could not delete the department in PostgreSQL", e);
             }
@@ -234,7 +249,7 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
-    public boolean deletePostgreDepartment(Employee employee) {
+    public boolean deletePostgreEmployee(Employee employee) {
         if (isEmployeeInDB(employee)) {
             String query = "DELETE FROM employee WHERE empno = ?";
             try (Connection connection = dbManager.getConnection();
