@@ -48,6 +48,19 @@ public abstract class DB4OBaseImplementation<T> {
     public abstract String getPrimaryKeyFieldName();
 
     /**
+     * Checks whether an object can be deleted before proceeding.
+     * <p>
+     * This method is meant to be overridden in subclasses if deletion requires validation.
+     *
+     * @param object The entity to check.
+     * @return {@code true} if the object can be deleted, {@code false} otherwise.
+     */
+
+    protected boolean canDeleteObject(T object) {
+        return true; // By default, allow deletion
+    }
+
+    /**
      * Checks if the given object exists in the db4o database based on its primary key.
      * <p>
      * This method uses the primary key field name obtained from {@link #getPrimaryKeyFieldName()}
@@ -143,25 +156,31 @@ public abstract class DB4OBaseImplementation<T> {
     }
 
     /**
-     * Deletes an object from the db4o database.
+     * Deletes an object from the db4o database only if it satisfies `canDeleteObject`.
      *
      * @param object The entity to be deleted.
      * @return {@code true} if the object was successfully deleted, {@code false} otherwise.
-     * @throws DatabaseDeleteException if an error occurs while deleting the object.
+     * @throws DatabaseDeleteException if an error occurs while deleting the object or if deletion is not allowed.
      */
 
     protected boolean deleteObject(T object) {
-        if (isObjectInDB(object)) {
-            try {
-                dbManager.getDb4oContainer().delete(object);
-                dbManager.getDb4oContainer().commit();
-                return true;
-            } catch (Exception e) {
-                dbManager.getDb4oContainer().rollback();
-                throw new DatabaseDeleteException("Could not delete the object " + object.getClass().getName() + " in db4o", e);
-            }
+        if (!isObjectInDB(object)) {
+            return false; // Object does not exist
         }
-        return false;
+
+        if (!canDeleteObject(object)) {
+            //throw new DatabaseDeleteException("Deletion not allowed for " + object.getClass().getSimpleName());
+            return false;
+        }
+
+        try {
+            dbManager.getDb4oContainer().delete(object);
+            dbManager.getDb4oContainer().commit();
+            return true;
+        } catch (Exception e) {
+            dbManager.getDb4oContainer().rollback();
+            throw new DatabaseDeleteException("Could not delete the object " + object.getClass().getName() + " in db4o", e);
+        }
     }
 
     /**
@@ -206,4 +225,22 @@ public abstract class DB4OBaseImplementation<T> {
             throw new DatabaseQueryException("Error querying all objects in db4o", e);
         }
     }
+
+    /**
+     * Helper method to create a db4o query for a specific class type.
+     *
+     * @param clazz The class type to constrain the query.
+     * @return A {@link Query} object for the specified class.
+     */
+
+    protected Query getDb4oQuery(Class<?> clazz) {
+        try {
+            Query query = dbManager.getDb4oContainer().query();
+            query.constrain(clazz);
+            return query;
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Error creating query for " + clazz.getSimpleName(), e);
+        }
+    }
+
 }

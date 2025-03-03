@@ -36,6 +36,19 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
     }
 
     /**
+     * Checks whether an object can be deleted before proceeding.
+     * <p>
+     * This method should be overridden in subclasses to enforce business rules.
+     *
+     * @param object The entity to check before deletion.
+     * @return {@code true} if the object can be deleted, {@code false} otherwise.
+     */
+
+    protected boolean canDeleteObject(T object) {
+        return true; // By default, allow deletion
+    }
+
+    /**
      * Checks whether the given object exists in the database.
      * <p>
      * If the object has an assigned ID, it queries the database using that ID.
@@ -52,14 +65,13 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
             Optional<T> optionalT = getObject(object.getID());
             return optionalT.isPresent();
         } else {
-            if (object instanceof HEmployee employee) {
-                Optional<HEmployee> duplicate = getDuplicate(employee);
+            if (object instanceof HEmployee HEmployee) {
+                Optional<HEmployee> duplicate = getDuplicate(HEmployee);
                 return duplicate.isPresent();
             }
         }
         return false;
     }
-
 
     /**
      * Stores a new entity in the database.
@@ -134,26 +146,31 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
     }
 
     /**
-     * Deletes an entity from the database.
+     * Deletes an entity from the database only if it satisfies `canDeleteObject()`.
      *
      * @param object The entity to be deleted.
      * @return {@code true} if the entity was successfully deleted, {@code false} otherwise.
-     * @throws DatabaseDeleteException if an error occurs during the deletion process.
+     * @throws DatabaseDeleteException if deletion is not allowed or fails.
      */
 
     protected boolean deleteObject(T object) {
-        if (isObjectInDB(object)) {
-            try (Session session = dbManager.openSession()) {
-                session.beginTransaction();
-                session.flush();
-                session.remove(object); //delete()
-                session.getTransaction().commit();
-                return true;
-            } catch (Exception e) {
-                throw new DatabaseDeleteException("Could not delete the object ID" + object.getID() + " in Hibernate JPA", e);
-            }
+        if (!isObjectInDB(object)) {
+            return false; // Object does not exist
         }
-        return false;
+
+        if (!canDeleteObject(object)) {
+            throw new DatabaseDeleteException("Deletion not allowed for " + object.getClass().getSimpleName());
+        }
+
+        try (Session session = dbManager.openSession()) {
+            session.beginTransaction();
+            session.flush();
+            session.remove(object);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            throw new DatabaseDeleteException("Could not delete the object ID " + object.getID() + " in Hibernate JPA", e);
+        }
     }
 
     /**
@@ -209,26 +226,43 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
      * This method queries the database for an HEmployee with the same employeeName and employeePosition.
      * It is used to check for duplicates when the entity does not yet have an assigned ID.
      *
-     * @param employee the HEmployee entity to check for duplicates.
+     * @param HEmployee the HEmployee entity to check for duplicates.
      * @return an {@code Optional<HEmployee>} containing the duplicate if found, or {@code Optional.empty()} otherwise.
      * @throws DatabaseQueryException if an error occurs while querying the database.
      */
 
-    private Optional<HEmployee> getDuplicate(HEmployee employee) {
+    private Optional<HEmployee> getDuplicate(HEmployee HEmployee) {
         String hql =
                 "FROM HEmployee e " +
-                "WHERE e.employeeName = :name " +
-                "AND e.employeePosition = :position";
+                        "WHERE e.employeeName = :name " +
+                        "AND e.employeePosition = :position";
 
         try (Session session = dbManager.openSession()) {
             HEmployee duplicate = session.createQuery(hql, HEmployee.class)
-                    .setParameter("name", employee.getEmployeeName())
-                    .setParameter("position", employee.getEmployeePosition())
+                    .setParameter("name", HEmployee.getEmployeeName())
+                    .setParameter("position", HEmployee.getEmployeePosition())
                     .setMaxResults(1)
                     .uniqueResult();
             return Optional.ofNullable(duplicate);
         } catch (Exception e) {
-            throw new DatabaseQueryException("Could not retrieve duplicate for employee " + employee.getEmployeeName(), e);
+            throw new DatabaseQueryException("Could not retrieve duplicate for employee " + HEmployee.getEmployeeName(), e);
+        }
+    }
+
+    /**
+     * Opens a new Hibernate session.
+     * <p>
+     * This method allows subclasses to access a session without needing direct access to {@code dbManager}.
+     *
+     * @return A {@link Session} instance.
+     * @throws DatabaseQueryException if an error occurs while opening the session.
+     */
+
+    protected Session openSession() {
+        try {
+            return dbManager.openSession();
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Could not open Hibernate session", e);
         }
     }
 }

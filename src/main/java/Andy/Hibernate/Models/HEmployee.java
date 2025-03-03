@@ -2,11 +2,9 @@ package Andy.Hibernate.Models;
 
 import jakarta.persistence.*;
 
-import java.util.Objects;
-
 @Entity
 @Table(name = "empleado")
-public class HEmployee implements DatabaseEntity {
+public class HEmployee extends Models.Employee implements DatabaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "empleado_id_gen")
     @SequenceGenerator(name = "empleado_id_gen", sequenceName = "empleado_empno_seq", allocationSize = 1)
@@ -16,17 +14,17 @@ public class HEmployee implements DatabaseEntity {
     private String employeeName;
     @Column(name = "puesto", length = 15)
     private String employeePosition;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "depno")
     private HDepartment HDepartment;
 
-    public HEmployee() {}
+    public HEmployee() {
+        super();
+    }
 
     // Employee ID is auto generated. We should not need to pass it as a parameter to the constructor
-    public HEmployee(String departmentName, String departmentAddress, HDepartment HDepartment) {
-        this.employeeName = departmentName;
-        this.employeePosition = departmentAddress;
-        this.HDepartment = HDepartment;
+    public HEmployee(Models.Employee employee) {
+        super(employee.getEmployeeName(), employee.getEmployeePosition(), employee.getDepartmentID(), employee.getDepartment());
     }
 
     /**
@@ -39,11 +37,11 @@ public class HEmployee implements DatabaseEntity {
         if (this == o) return true;
         if (!(o instanceof HEmployee)) return false;
 
-        HEmployee employee = (HEmployee) o;
+        HEmployee HEmployee = (HEmployee) o;
         return
-                employee.employeeName.equals(employeeName) &&
-                employee.employeePosition.equals(employeePosition) &&
-                employee.HDepartment.getId().equals(HDepartment.getId());
+                HEmployee.employeeName.equals(employeeName) &&
+                HEmployee.employeePosition.equals(employeePosition) &&
+                HEmployee.HDepartment.getId().equals(HDepartment.getId());
     }
 
     @Override

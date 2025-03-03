@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "departamento")
-public class HDepartment implements DatabaseEntity {
+public class HDepartment extends Models.Department implements DatabaseEntity {
     @Id
     @Column(name = "depno", nullable = false)
     private Integer id;
@@ -18,14 +18,15 @@ public class HDepartment implements DatabaseEntity {
     @OneToMany
     private Set<HEmployee> employeesList = new LinkedHashSet<>();
 
-    public HDepartment() {}
-
-    public HDepartment(final int departmentID, String departmentName, String departmentAddress) {
-        this.id = departmentID;
-        this.departmentName = departmentName;
-        this.departmentAddress = departmentAddress;
+    public HDepartment() {
+        super();
     }
 
+    public HDepartment(Models.Department department) {
+        this.id = department.getDepartmentID();
+        this.departmentName = department.getDepartmentName();
+        this.departmentAddress = department.getDepartmentAddress();
+    }
 
     @Override
     public String toString() {

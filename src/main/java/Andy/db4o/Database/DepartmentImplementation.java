@@ -4,6 +4,8 @@ import DAO.Interfaces.DepartmentDAO;
 import Exceptions.DatabaseDeleteException;
 import Exceptions.DatabaseInsertException;
 import Models.Department;
+import Models.Employee;
+import com.db4o.query.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +86,22 @@ public class DepartmentImplementation extends DB4OBaseImplementation<Department>
 
         deleteObject(departmentOptional.get());
         return departmentOptional;
+    }
+
+    // From superclass
+    @Override
+    protected boolean canDeleteObject(Department department) {
+        boolean canDelete;
+        Query query = getDb4oQuery(Employee.class); // Get a query for Employee class
+        query.descend("departmentID").constrain(department.getDepartmentID());
+
+        List<Employee> employees = query.execute();
+        canDelete = employees.isEmpty();;
+        if (!canDelete) {
+            System.out.println("Department " + department.getDepartmentID() +
+                    " could not be deleted because it contains employees");
+        }
+        return canDelete; // Only allow deletion if there are no employees
     }
 
     /**
