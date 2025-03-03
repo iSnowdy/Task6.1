@@ -36,7 +36,7 @@ public class DatabaseManager  {
      * Reads the file specified in the Constants.FILE_PATH and updates the cache if the file exists.
      */
     public void readFile(){
-        File file = new File(Constants.FILE_PATH);
+        File file = new File(Constants.FILE_NAME);
         if(file.exists()){
             updateCache(file);
         }
@@ -59,7 +59,10 @@ public class DatabaseManager  {
 
 
     }
-
+    public void closeDB(){
+        departmentList.clear();
+        employeeList.clear();
+    }
     /**
      * Iterates through the list of strings (tuples) and processes each one to populate the department and employee lists.
      * @param filas The list of strings representing the tuples.
@@ -181,19 +184,27 @@ public class DatabaseManager  {
     public void saveEmployee(Employee employee, File file) {
         File tempFile = new File("tempFile.txt");
         boolean found = false;
+        boolean employeeSection = false;
         try (BufferedReader reader = new BufferedReader(new FileReader(file));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
             String currentLine;
+            String lastId = "";
             while ((currentLine = reader.readLine()) != null) {
-                if (currentLine.startsWith("employee(" + employee.getEmployeeID() + ",")) {
-                    writer.write("employee(" + employee.getEmployeeID() + "," + employee.getEmployeeName() + "," + employee.getEmployeePosition() + "," + employee.getDepartmentID() + ")." + System.getProperty("line.separator"));
+                if (currentLine.startsWith("-- employees:")) {
+                    employeeSection = true;
+                }
+                if (employeeSection && currentLine.startsWith("employee(" + employee.getEmployeeID() + ",")) {
+                    writer.write("employee(" + employee.getEmployeeID() + "," + employee.getEmployeeName() + "," + employee.getEmployeePosition() + "," + employee.getDepartmentID() + ")" + System.getProperty("line.separator"));
                     found = true;
                 } else {
+                    if (employeeSection && currentLine.startsWith("employee(")){
+                        lastId = currentLine.split(",")[0].split("\\(")[1];
+                    }
                     writer.write(currentLine + System.getProperty("line.separator"));
                 }
             }
             if (!found) {
-                writer.write("employee(" + employee.getEmployeeID() + "," + employee.getEmployeeName() + "," + employee.getEmployeePosition() + "," + employee.getDepartmentID() + ")." + System.getProperty("line.separator"));
+                writer.write("employee(" + (Integer.parseInt(lastId)+1) + "," + employee.getEmployeeName() + "," + employee.getEmployeePosition() + "," + employee.getDepartmentID() + ")" + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,20 +221,23 @@ public class DatabaseManager  {
      */
     public void saveDepartment(Department department, File file) {
         File tempFile = new File("tempFile.txt");
-        boolean found = false;
+        boolean departmentSection = false;
         try (BufferedReader reader = new BufferedReader(new FileReader(file));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
             String currentLine;
             while ((currentLine = reader.readLine()) != null) {
-                if (currentLine.startsWith("department(" + department.getDepartmentID() + ",")) {
-                    writer.write("department(" + department.getDepartmentID() + "," + department.getDepartmentName() + "," + department.getDepartmentAddress() + ")." + System.getProperty("line.separator"));
-                    found = true;
+                if (currentLine.startsWith("-- departments:")) {
+                    departmentSection = true;
+                }
+                if (departmentSection && currentLine.startsWith("department(" + department.getDepartmentID() + ",")) {
+                    writer.write("department(" + department.getDepartmentID() + "," + department.getDepartmentName() + "," + department.getDepartmentAddress() + ")" + System.getProperty("line.separator"));
+                } else if (!departmentSection &&currentLine.startsWith("-- employees:")) {
+                    String txt = "department(" + department.getDepartmentID() + "," + department.getDepartmentName() + "," + department.getDepartmentAddress() + ")" + System.getProperty("line.separator");
+                    String extra = txt + currentLine + System.getProperty("line.separator");
+                    writer.write(extra,0,extra.length());
                 } else {
                     writer.write(currentLine + System.getProperty("line.separator"));
                 }
-            }
-            if (!found) {
-                writer.write("department(" + department.getDepartmentID() + "," + department.getDepartmentName() + "," + department.getDepartmentAddress() + ")." + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
             e.printStackTrace();

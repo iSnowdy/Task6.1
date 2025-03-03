@@ -1,7 +1,8 @@
 package Hugo.Menu;
 
 //import Andy.db4o.Database.DatabaseManager;
-import Hugo.PostgreSQL.DatabaseManager;
+// import Hugo.PostgreSQL.DatabaseManager;
+import Toni.MongoDB.DatabaseManager;
 import java.util.Scanner;
 
 public class Menu {
