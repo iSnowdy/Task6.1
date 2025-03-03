@@ -1,19 +1,22 @@
 package Andy.Hibernate.Database;
 
 import Andy.Hibernate.Models.HDepartment;
-import DAO.Interfaces.HibernateInterfaces.HDepartmentDAO;
+import DAO.Interfaces.DepartmentDAO;
+import Exceptions.DatabaseQueryException;
+import Models.Department;
+import org.hibernate.Session;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of {@link HDepartmentDAO} using Hibernate JPA.
+ * Implementation of {@link DepartmentDAO} using Hibernate JPA.
  * <p>
  * This class extends {@link HibernateBaseImplementation} to provide CRUD operations for the
  * {@link HDepartment} entity.
  */
 
-public class DepartmentImplementation extends HibernateBaseImplementation<HDepartment> implements HDepartmentDAO {
+public class DepartmentImplementation extends HibernateBaseImplementation<HDepartment> implements DepartmentDAO {
 
     /**
      * Constructs a new {@link DepartmentImplementation} instance and injects the {@link DatabaseManager} for Hibernate
@@ -36,9 +39,15 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
      */
 
     @Override
-    public boolean addDepartment(HDepartment department) {
-        if (storeObject(department)) {
-            System.out.println("Department ID " + department.getId() + " succesfully added");
+    public boolean addDepartment(Models.Department department) {
+        System.out.println("Inside implementation...");
+        System.out.println(department);
+
+        HDepartment hDepartment =
+                new HDepartment(department);
+
+        if (storeObject(hDepartment)) {
+            System.out.println("Department ID " + department.getDepartmentID() + " successfully added");
             return true;
         }
         return false;
@@ -56,8 +65,15 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
      */
 
     @Override
-    public Optional<HDepartment> updateDepartment(Object id) {
-        return updateObject(id);
+    public Optional<Models.Department> updateDepartment(Object id) {
+        Optional<HDepartment> hDepartmentOptional = updateObject(id);
+
+        // Convert HDepartment to Models.Department if present
+        return hDepartmentOptional.map(hDept -> new Models.Department(
+                hDept.getDepartmentID(),
+                hDept.getDepartmentName(),
+                hDept.getDepartmentAddress()
+        ));
     }
 
     /**
@@ -70,16 +86,38 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
      */
 
     @Override
-    public Optional<HDepartment> deleteDepartment(Object id) {
-        Optional<HDepartment> departmentOptional = getObject(id);
-        if (departmentOptional.isEmpty()) {
+    public Optional<Models.Department> deleteDepartment(Object id) {
+        Optional<HDepartment> hDepartmentOptional = getObject(id);
+
+        if (hDepartmentOptional.isEmpty()) {
             System.out.println("Department ID " + id + " could not be found");
             return Optional.empty();
         }
 
-        deleteObject(departmentOptional.get());
+        deleteObject(hDepartmentOptional.get());
         System.out.println("Department ID " + id + " successfully deleted");
-        return departmentOptional;
+
+        return hDepartmentOptional.map(hDept ->
+                new Models.Department(hDept.getDepartmentID(), hDept.getDepartmentName(), hDept.getDepartmentAddress()));
+    }
+
+    @Override
+    protected boolean canDeleteObject(HDepartment department) {
+        String hql = "SELECT COUNT(e) FROM HEmployee e WHERE e.id = :depID";
+
+        try (Session session = openSession()) {
+            Long count = session.createQuery(hql, Long.class)
+                    .setParameter("depID", department.getDepartmentID())
+                    .getSingleResult();
+
+            if (count > 0) {
+                System.out.println("Department " + department.getDepartmentID() + " could not be deleted because it contains employees");
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            throw new DatabaseQueryException("Could not check employees for department ID " + department.getDepartmentID(), e);
+        }
     }
 
     /**
@@ -91,14 +129,9 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
      */
 
     @Override
-    public Optional<HDepartment> findDepartmentByID(Object id) {
-        Optional<HDepartment> departmentOptional = getObject(id);
-        if (departmentOptional.isEmpty()) {
-            System.out.println("Department ID " + id + " could not be found");
-            return Optional.empty();
-        }
-        System.out.println("Department ID " + id + " successfully found");
-        return departmentOptional;
+    public Optional<Models.Department> findDepartmentByID(Object id) {
+        Optional<HDepartment> hDepartmentOptional = getObject(id);
+        return hDepartmentOptional.map(hDept -> new Models.Department(hDept.getDepartmentID(), hDept.getDepartmentName(), hDept.getDepartmentAddress()));
     }
 
     /**
@@ -109,7 +142,15 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
      */
 
     @Override
-    public List<HDepartment> findAllDepartments() {
-        return getObjectList();
+    public List<Models.Department> findAllDepartments() {
+        List<HDepartment> hDepartments = getObjectList(); // Retrieve HDepartment from DB
+
+        return hDepartments.stream()
+                .map(hDept -> new Models.Department(
+                        hDept.getID(),
+                        hDept.getDepartmentName(),
+                        hDept.getDepartmentAddress()
+                ))
+                .toList(); // Convert to List<Models.Department>
     }
 }
