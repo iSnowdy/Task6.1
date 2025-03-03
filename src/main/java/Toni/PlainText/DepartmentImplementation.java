@@ -8,6 +8,7 @@ import java.util.Scanner;
 import DAO.Interfaces.DepartmentDAO;
 import Models.Department;
 import Utils.Constants;
+import Utils.ValidationUtil;
 
 /**
  * Implementation of the DepartmentDAO interface for managing Department data.
@@ -15,14 +16,16 @@ import Utils.Constants;
 public class DepartmentImplementation implements DepartmentDAO {
     private final DatabaseManager dbManager;
     private final File file;
+    private final Scanner scanner;
 
     /**
      * Constructor that initializes the DatabaseManager and file.
      */
-    public DepartmentImplementation() {
-        dbManager = new DatabaseManager();
-        file = new File(Constants.FILE_PATH);
+    public DepartmentImplementation(DatabaseManager databaseManager) {
+        dbManager = databaseManager;
+        file = new File(Constants.FILE_NAME);
         dbManager.instanceData(file);
+        scanner = new Scanner(System.in);
     }
 
     /**
@@ -45,16 +48,12 @@ public class DepartmentImplementation implements DepartmentDAO {
      */
     @Override
     public Optional<Department> updateDepartment(Object id) {
-        Department department = dbManager.getDepartmentById((int) id);
+        Department department = dbManager.getDepartmentById(Integer.parseInt(String.valueOf(id)));
         if (department != null) {
-            try (Scanner scanner = new Scanner(System.in)) {
-                System.out.println("Enter new department name:");
-                String name = scanner.nextLine();
-                System.out.println("Enter new department address:");
-                String address = scanner.nextLine();
-                department.setDepartmentName(name);
-                department.setDepartmentAddress(address);
-            }
+            String name = setValidName();
+            String address = setValidAddress();
+            department.setDepartmentName(name);
+            department.setDepartmentAddress(address);
             dbManager.saveObject(department, file);
             return Optional.of(department);
         }
@@ -96,5 +95,83 @@ public class DepartmentImplementation implements DepartmentDAO {
     @Override
     public List<Department> findAllDepartments() {
         return dbManager.getDepartmentList();
+    }
+
+
+    private String getTextScanned(String textToPrint) {
+        System.out.println(textToPrint);
+        while (!scanner.hasNext()) {
+            System.out.println("No input detected. Please enter a valid input:");
+            scanner.next(); // consume the invalid input
+        }
+        return scanner.next();
+    }
+    private String setValidId(){
+        String id = "0";
+        boolean done = false;
+        do {
+            try {
+                id = getTextScanned("Set department ID: ");
+                scanner.nextLine();
+                if (!ValidationUtil.isValidDepartmentId(Integer.parseInt(id))) {
+                    done = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Department ID must be a number");
+            }
+        }while (!done);
+        return id;
+    }
+
+    private String setValidName(){
+        String name = "";
+        boolean done = false;
+        do {
+            try {
+                name = getTextScanned("Set department Name: ");
+                scanner.nextLine();
+
+                if (ValidationUtil.isValidDepartmentName(name)) {
+                    done = true;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }while (!done);
+        return name;
+    }
+    private String setValidAddress(){
+        String address = "";
+        boolean done = false;
+        do {
+            try{
+                address = getTextScanned("Set department address: ");
+                scanner.nextLine();
+
+                if (ValidationUtil.isValidDepartmentAddress(address)) {
+                    done = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Department Address must be Valid");
+            }
+        }while (!done);
+        return address;
+    }
+
+    private int setValidDepartmentId(List<Department> departmentList){
+        int id;
+        boolean done = false;
+        do {
+            departmentList.forEach(System.out::println);
+            id = Integer.parseInt(setValidId());
+            int finalId = id;
+            if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {
+                System.out.println("Department with id: "+id+" not found!");
+            }
+            else {
+                done = true;
+            }
+        } while (!done);
+        return id;
     }
 }

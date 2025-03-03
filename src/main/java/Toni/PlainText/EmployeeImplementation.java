@@ -20,9 +20,9 @@ public class EmployeeImplementation implements EmployeeDAO {
     /**
      * Constructor that initializes the DatabaseManager and file.
      */
-    public EmployeeImplementation() {
-        dbManager = new DatabaseManager();
-        file = new File(Constants.FILE_PATH);
+    public EmployeeImplementation(DatabaseManager databaseManager) {
+        dbManager = databaseManager;
+        file = new File(Constants.FILE_NAME);
         dbManager.instanceData(file);
     }
 

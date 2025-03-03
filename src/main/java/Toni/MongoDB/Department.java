@@ -20,23 +20,28 @@ public class Department extends Models.Department {
     private String departmentAddress; // VARCHAR 13
 
     public Department(final int departmentID, String departmentName, String departmentAddress) {
-        super(departmentID,
-                departmentName,
-                departmentAddress);
+        super();
+        department_ID = new ObjectId();
+        this.departmentID = departmentID;
+        this.departmentName = departmentName;
+        this.departmentAddress = departmentAddress;
     }
 
     public Department(Models.Department dep) {
-        super(dep.getDepartmentID(),
-                dep.getDepartmentName(),
-                dep.getDepartmentAddress());
+        super();
+        department_ID = new ObjectId();
+        this.departmentID = dep.getDepartmentID();
+        this.departmentName = dep.getDepartmentName();
+        this.departmentAddress = dep.getDepartmentAddress();
+
     }
 
     public Department(Document doc) {
-        super(
-                doc.getInteger("id"),
-                doc.getString("name"),
-                doc.getString("address"));
+        super();
         this.department_ID = doc.getObjectId("_id");
+        this.departmentID = doc.getInteger("id");
+        this.departmentName = doc.getString("name");
+        this.departmentAddress = doc.getString("address");
     }
 
     // Getters and Setters
