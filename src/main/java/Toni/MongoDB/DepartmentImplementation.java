@@ -14,14 +14,14 @@ import DAO.Interfaces.DepartmentDAO;
  * Implementation of DepartmentDAO interface for MongoDB.
  */
 public class DepartmentImplementation implements DepartmentDAO {
-    private DatabaseManager dbAccess;
+    private final DatabaseManager dbAccess;
     private final Scanner scanner;
 
     /**
      * Constructor initializes DatabaseManager and Scanner.
      */
-    public DepartmentImplementation() {
-        dbAccess = new DatabaseManager();
+    public DepartmentImplementation(DatabaseManager databaseManager) {
+        dbAccess = databaseManager;
         scanner = new Scanner(System.in);
     }
 
@@ -100,6 +100,7 @@ public class DepartmentImplementation implements DepartmentDAO {
     public Optional<Models.Department> findDepartmentByID(Object id) {
         Optional<Models.Department> result = Optional.empty();
         Document depDoc = dbAccess.getDepartamentDoc((int)id);
+        System.out.println(depDoc);
         if (depDoc != null){
             result = Optional.of(new Department(depDoc));
         }

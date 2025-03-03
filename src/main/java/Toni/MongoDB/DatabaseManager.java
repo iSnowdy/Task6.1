@@ -60,7 +60,7 @@ public class DatabaseManager {
     /**
      * Closes the connection to the MongoDB database.
      */
-    public void closeDb(){
+    public void closeDB(){
         mongoClient.close();
     }
 
@@ -81,6 +81,7 @@ public class DatabaseManager {
     public Document getDepartamentDoc(int id){
         MongoCollection<Document> equiposCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
         Document query = new Document("id",id);
+        System.out.println(equiposCollection.find(query).first().toJson());
         return equiposCollection.find(query).first();
     }
 
@@ -170,18 +171,24 @@ public class DatabaseManager {
      * @param department the new department of the employee.
      */
     public void updateEmployee(int id, String name, String position, Department department ){
-        Document query = new Document("id", id); 
+        Document query = new Document("id", id);
         Document update = new Document();
-        if (!name.isEmpty()){
-            update.append("name", position);
+        Document setData = new Document();
+
+        if (!name.isEmpty()) {
+            setData.append("name", name);
         }
         if (!position.isEmpty()) {
-            update.append("position", name);
+            setData.append("position", position);
         }
         if (department != null) {
-            update.append("department", department.toDocument());
+            setData.append("department", department.toDocument());
         }
-        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(eq(query), update);
+
+        if (!setData.isEmpty()) {
+            update.append("$set", setData);
+            getCollection(Constants.EMPLOYEE_COLLECTION).updateOne(eq(query), update);
+        }
 
     }
 
