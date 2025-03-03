@@ -7,9 +7,6 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
 public class Employee extends Models.Employee {
-//    @Column(name = "nombre", length = 10)
-//    @Column(name = "puesto", length = 15)
-
 
     @BsonId
     private ObjectId employee_ID;
@@ -20,6 +17,7 @@ public class Employee extends Models.Employee {
     @BsonProperty("position")
     private String employeePosition;
 
+    @BsonProperty("departmentId")
     private int departmentID; // FK references Department
 
     public Employee(String employeeName, String employeePosition, Department department) {
@@ -28,13 +26,13 @@ public class Employee extends Models.Employee {
         this.employeePosition = employeePosition;
     }
 
-//    public Employee(int employeeID, String employeeName, String employeePosition, Department department) {
-//        this.employee_ID = new ObjectId();
-//        this.employeeID = employeeID;
-//        this.employeeName = employeeName;
-//        this.employeePosition = employeePosition;
-//        this.departmentID = department;
-//    }
+   public Employee(int employeeID, String employeeName, String employeePosition, int department) {
+       this.employee_ID = new ObjectId();
+       this.employeeID = employeeID;
+       this.employeeName = employeeName;
+       this.employeePosition = employeePosition;
+       this.departmentID = department;
+   }
 
     public Employee(Models.Employee employee) {
         this.employee_ID = new ObjectId();
@@ -49,6 +47,7 @@ public class Employee extends Models.Employee {
         this.employeeID = doc.getInteger("id");
         this.employeeName = doc.getString("name");
         this.employeePosition = doc.getString("position");
+        this.departmentID = doc.getInteger("department_id");
     }
 
 
@@ -71,10 +70,10 @@ public class Employee extends Models.Employee {
                 -----------------------
                 Employee Information
                 -----------------------
-                Employee ID: %d \n
-                Employee Name: %s \n
-                Employee Position: %s \n
-                Department ID: %s \n
+                Employee ID: %s
+                Employee Name: %s
+                Employee Position: %s
+                Department ID: %s
                 -----------------------\n""".formatted(getEmployeeID(),getEmployeeName(),getEmployeePosition(), getDepartmentID());
     }
 
@@ -82,7 +81,8 @@ public class Employee extends Models.Employee {
         return new Document("_id",employee_ID)
                 .append("id",employeeID)
                 .append("name",employeeName)
-                .append("position",employeePosition);
+                .append("position",employeePosition)
+                .append("department_id",departmentID);
     }
 
 

@@ -15,6 +15,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 import Exceptions.DatabaseOpeningException;
 import Utils.Constants;
@@ -81,7 +82,6 @@ public class DatabaseManager {
     public Document getDepartamentDoc(int id){
         MongoCollection<Document> equiposCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
         Document query = new Document("id",id);
-        System.out.println(equiposCollection.find(query).first().toJson());
         return equiposCollection.find(query).first();
     }
 
@@ -108,15 +108,9 @@ public class DatabaseManager {
      */
     public void updateDepartment(int id, String name, String address ){
         Document query = new Document("id", id); //eq()
-        Document update; // set()
-        if (name.isEmpty()){
-            update = new Document("address", address);
-        } else if (address.isEmpty()) {
-            update = new Document("name", name);
-        } else  {
-            update = new Document("name", name).append("address", address);
-        }
-        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(eq(query), update);
+        Document update = new Document("name", name).append("address", address);
+        Document setData = new Document("$set", update);
+        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(query, setData);
 
     }
 
@@ -126,7 +120,7 @@ public class DatabaseManager {
      */
     public void deleteDepartamento(int id) {
         Document filtro = new Document("id", id);
-        getCollection(Constants.DEPARTMENT_COLLECTION).deleteOne(eq(filtro));
+        getCollection(Constants.DEPARTMENT_COLLECTION).deleteOne(filtro);
     }
 
     /**
@@ -149,7 +143,7 @@ public class DatabaseManager {
      */
     public boolean deleteEmployee(int id) {
         Document filtro = new Document("id", id);
-        return getCollection(Constants.EMPLOYEE_COLLECTION).deleteOne(eq(filtro)).getDeletedCount() > 0;
+        return getCollection(Constants.EMPLOYEE_COLLECTION).deleteOne(filtro).getDeletedCount() > 0;
     }
 
     /**
@@ -164,6 +158,17 @@ public class DatabaseManager {
     }
 
     /**
+     * Retrieves an employee document by its ID.
+     * @param id the ID of the employee.
+     * @return the employee document.
+     */
+    public Document getEmployeeDocByDepId(int id){
+        MongoCollection<Document> equiposCollection = getCollection(Constants.EMPLOYEE_COLLECTION);
+        Document query = new Document("departmentId",id);
+        return equiposCollection.find(query).first();
+    }
+
+    /**
      * Updates an employee's name, position, and/or department.
      * @param id the ID of the employee.
      * @param name the new name of the employee.
@@ -172,7 +177,6 @@ public class DatabaseManager {
      */
     public void updateEmployee(int id, String name, String position, Department department ){
         Document query = new Document("id", id);
-        Document update = new Document();
         Document setData = new Document();
 
         if (!name.isEmpty()) {
@@ -182,12 +186,11 @@ public class DatabaseManager {
             setData.append("position", position);
         }
         if (department != null) {
-            setData.append("department", department.toDocument());
+            setData.append("department_id", department.getDepartmentID());
         }
-
         if (!setData.isEmpty()) {
-            update.append("$set", setData);
-            getCollection(Constants.EMPLOYEE_COLLECTION).updateOne(eq(query), update);
+            Document update = new Document("$set", setData);
+            System.out.println(getCollection(Constants.EMPLOYEE_COLLECTION).updateOne(query,  update));
         }
 
     }

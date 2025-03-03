@@ -83,9 +83,13 @@ public class DepartmentImplementation implements DepartmentDAO {
     public Optional<Models.Department> deleteDepartment(Object id) {
         Optional<Models.Department> result = Optional.empty();
         Document depDoc = dbAccess.getDepartamentDoc((int)id);
-        if (depDoc != null){
+        Document employee = dbAccess.getEmployeeDocById((int)id);
+        if (depDoc != null && employee == null){
             dbAccess.deleteDepartamento((int)id);
             result = Optional.of(new Department(depDoc));
+            System.out.println("Department deleted successfully.");
+        }else {
+            System.out.println("Invalid department ID provided.");
         }
 
         return result;
