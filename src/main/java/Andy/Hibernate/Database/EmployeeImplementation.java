@@ -1,21 +1,21 @@
 package Andy.Hibernate.Database;
 
+import Andy.Hibernate.Models.HDepartment;
 import Andy.Hibernate.Models.HEmployee;
-import DAO.Interfaces.HibernateInterfaces.HEmployeeDAO;
-import Exceptions.DatabaseQueryException;
-import org.hibernate.Session;
+import DAO.Interfaces.EmployeeDAO;
+import Models.Employee;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of {@link HEmployeeDAO} using Hibernate JPA.
+ * Implementation of {@link EmployeeDAO} using Hibernate JPA.
  * <p>
  * The class extends {@link HibernateBaseImplementation} to provide CRUD operations for the
  * {@link HEmployee} entity.
  */
 
-public class EmployeeImplementation extends HibernateBaseImplementation<HEmployee> implements HEmployeeDAO {
+public class EmployeeImplementation extends HibernateBaseImplementation<HEmployee> implements EmployeeDAO {
 
     /**
      * Constructs a new {@link EmployeeImplementation} instance and injects the {@link DatabaseManager} for Hibernate
@@ -32,16 +32,21 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
     /**
      * Adds a new employee to the Hibernate JPA database.
      *
-     * @param employee The {@link HEmployee} to be added.
+     * @param employee The {@link Employee} to be added.
      * @throws Exceptions.DatabaseInsertException if an error occurs during insertion.
      */
 
     @Override
-    public void addEmployee(HEmployee employee) {
-        if (storeObject(employee))
+    public void addEmployee(Models.Employee employee) {
+        HEmployee hEmployee = new HEmployee(employee);
+
+        if (storeObject(hEmployee)) {
             System.out.println("Employee " + employee.getEmployeeName() + " was added to the Hibernate JPA DB");
-        else System.out.println("Employee " + employee.getEmployeeName() + " could not be added to the Hibernate JPA DB");
+        } else {
+            System.out.println("Employee " + employee.getEmployeeName() + " could not be added to the Hibernate JPA DB");
+        }
     }
+
 
     /**
      * Updates an existing employee in the database.
@@ -55,8 +60,19 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
      */
 
     @Override
-    public Optional<HEmployee> updateEmployee(Object id) {
-        return updateObject(id);
+    public Optional<Models.Employee> updateEmployee(Object id) {
+        Optional<HEmployee> hEmployeeOptional = updateObject(id);
+
+        return hEmployeeOptional.map(hEmp -> new Models.Employee(
+                hEmp.getEmployeeName(),
+                hEmp.getEmployeePosition(),
+                hEmp.getDepartment().getDepartmentID(),
+                new Models.Department(
+                        hEmp.getDepartment().getDepartmentID(),
+                        hEmp.getDepartment().getDepartmentName(),
+                        hEmp.getDepartment().getDepartmentAddress()
+                )
+        ));
     }
 
     /**
@@ -89,15 +105,19 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
      */
 
     @Override
-    public Optional<HEmployee> findEmployeeByID(Object id) {
-        Optional<HEmployee> employeeOptional = getObject(id);
-        if (employeeOptional.isEmpty()) {
-            System.out.println("Employee ID " + id + " not found in the Hibernate JPA DB");
-            return Optional.empty();
-        }
+    public Optional<Models.Employee> findEmployeeByID(Object id) {
+        Optional<HEmployee> hEmployeeOptional = getObject(id);
 
-        System.out.println("Employee ID " + id + " found in the Hibernate JPA DB");
-        return employeeOptional;
+        return hEmployeeOptional.map(hEmp -> new Models.Employee(
+                hEmp.getEmployeeName(),
+                hEmp.getEmployeePosition(),
+                hEmp.getDepartment().getDepartmentID(),
+                new Models.Department(
+                        hEmp.getDepartment().getDepartmentID(),
+                        hEmp.getDepartment().getDepartmentName(),
+                        hEmp.getDepartment().getDepartmentAddress()
+                )
+        ));
     }
 
     /**
@@ -108,7 +128,21 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
      */
 
     @Override
-    public List<HEmployee> findAllEmployees() {
-        return getObjectList();
+    public List<Models.Employee> findAllEmployees() {
+        List<HEmployee> hEmployees = getObjectList();
+
+        return hEmployees.stream()
+                .map(hEmp -> new Models.Employee(
+                        hEmp.getID(),
+                        hEmp.getEmployeeName(),
+                        hEmp.getEmployeePosition(),
+                        hEmp.getDepartment().getID(),
+                        new Models.Department(
+                                hEmp.getDepartment().getID(),
+                                hEmp.getDepartment().getDepartmentName(),
+                                hEmp.getDepartment().getDepartmentAddress()
+                        )
+                ))
+                .toList();
     }
 }
