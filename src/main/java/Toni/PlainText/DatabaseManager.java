@@ -30,6 +30,7 @@ public class DatabaseManager  {
     public DatabaseManager() {
         departmentList = new ArrayList<>();
         employeeList = new ArrayList<>();
+        readFile();
     }
 
     /**
@@ -51,6 +52,7 @@ public class DatabaseManager  {
         try (FileInputStream fis = new FileInputStream(file)){
             String fullDocument = new String(fis.readAllBytes());
             List<String>filas = List.of(fullDocument.split("\n"));
+
             iterTuples(filas);
 
         } catch (IOException e) {
@@ -68,6 +70,8 @@ public class DatabaseManager  {
      * @param filas The list of strings representing the tuples.
      */
     private void iterTuples(List<String> filas) {
+        employeeList = new ArrayList<>();
+        departmentList = new ArrayList<>();
         String regex = "\\((.*?)\\)"; // Expresión regular
         List<String> columns = new ArrayList<>(); // Sobra por el momento.
         String entity = "";
@@ -91,7 +95,7 @@ public class DatabaseManager  {
                 }
                 String[] values = valuesInsideParentheses.split(",");
                 if (entity.equals(Constants.ENTITY_DEPARTMENT)){
-                    departmentList.add(new Department(Integer.parseInt(values[0]),values[1],values[2]));
+                    verifyCanInstanceDep(values);
                 }else if(entity.equals(Constants.ENTITY_EMPLOYEE)){
                     Department dep = new Department(0,"","");
                     for (Department depart : departmentList){
@@ -102,6 +106,16 @@ public class DatabaseManager  {
                     employeeList.add(new Employee(Integer.parseInt(values[0]),values[1],values[2],Integer.parseInt(values[3]),dep));
                 }
             }
+        }
+    }
+
+    private void verifyCanInstanceDep(String[] values){
+        Department newDep = new Department(Integer.parseInt(values[0]), values[1], values[2]);
+        boolean exists = departmentList.stream()
+                .anyMatch(department -> department.getDepartmentID() == newDep.getDepartmentID());
+
+        if (!exists) {
+            departmentList.add(newDep);
         }
     }
 
@@ -231,7 +245,8 @@ public class DatabaseManager  {
                 }
                 if (departmentSection && currentLine.startsWith("department(" + department.getDepartmentID() + ",")) {
                     writer.write("department(" + department.getDepartmentID() + "," + department.getDepartmentName() + "," + department.getDepartmentAddress() + ")" + System.getProperty("line.separator"));
-                } else if (!departmentSection &&currentLine.startsWith("-- employees:")) {
+                } else if (currentLine.startsWith("-- employees:")) {
+                    System.out.println("entra");
                     String txt = "department(" + department.getDepartmentID() + "," + department.getDepartmentName() + "," + department.getDepartmentAddress() + ")" + System.getProperty("line.separator");
                     String extra = txt + currentLine + System.getProperty("line.separator");
                     writer.write(extra,0,extra.length());
