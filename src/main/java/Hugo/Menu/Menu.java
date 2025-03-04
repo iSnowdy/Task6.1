@@ -1,22 +1,48 @@
 package Hugo.Menu;
 
-import Andy.Hibernate.Database.DatabaseManager;
+//import Andy.Hibernate.Database.DatabaseManager;
 //import Andy.db4o.Database.DatabaseManager;
-//import Hugo.PostgreSQL.DatabaseManager;
-//import Toni.MongoDB.DatabaseManager;
+import Hugo.PostgreSQL.DatabaseManager;
+//import Toni.PlainText.DatabaseManager;
 
 import java.util.Scanner;
 
+/**
+ * The {@code Menu} class provides a command-line interface for interacting with the database.
+ * It allows users to manage departments and employees through a series of menus and options.
+ * This class relies on {@link DatabaseManager} for database connections and {@link UserInteractions}
+ * for handling user input and performing operations.
+ */
 public class Menu {
+
+    /**
+     * Scanner object for reading user input from the console.
+     */
     private Scanner scan = new Scanner(System.in);
+
+    /**
+     * The database manager used to establish and manage connections to the database.
+     */
     private final DatabaseManager manager;
+
+    /**
+     * The user interactions handler for performing operations on departments and employees.
+     */
     private final UserInteractions userInteractions;
 
+    /**
+     * Constructs a new {@code Menu} instance.
+     * Initializes the {@link DatabaseManager} and {@link UserInteractions} instances.
+     */
     public Menu() {
         manager = new DatabaseManager();
         userInteractions = new UserInteractions(manager);
     }
 
+    /**
+     * Starts the main menu loop, allowing the user to interact with the system.
+     * The user can choose to manage departments, employees, or close the application.
+     */
     public void menuStart() {
         boolean close = false;
 
@@ -42,6 +68,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Displays the main menu options to the user.
+     */
     private void menu() {
         System.out.println("\n====================================");
         System.out.println("|            MENU                   |");
@@ -53,6 +82,9 @@ public class Menu {
         System.out.print("Select an option: ");
     }
 
+    /**
+     * Displays the department menu options to the user.
+     */
     private void departmentMenu() {
         System.out.println("\n====================================");
         System.out.println("|        DEPARTMENT MENU            |");
@@ -67,6 +99,10 @@ public class Menu {
         departmentSwitch();
     }
 
+    /**
+     * Handles the user's selection from the department menu.
+     * Calls the appropriate method in {@link UserInteractions} based on the user's choice.
+     */
     private void departmentSwitch() {
         System.out.print("Select an option: ");
 
@@ -84,6 +120,9 @@ public class Menu {
         }
     }
 
+    /**
+     * Displays the employee menu options to the user.
+     */
     private void employeeMenu() {
         System.out.println("\n====================================");
         System.out.println("|         EMPLOYEE MENU             |");
@@ -98,6 +137,10 @@ public class Menu {
         employeeSwitch();
     }
 
+    /**
+     * Handles the user's selection from the employee menu.
+     * Calls the appropriate method in {@link UserInteractions} based on the user's choice.
+     */
     private void employeeSwitch() {
         System.out.print("Select an option: ");
 
