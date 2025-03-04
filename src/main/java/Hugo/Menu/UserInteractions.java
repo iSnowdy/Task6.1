@@ -1,16 +1,22 @@
 package Hugo.Menu;
 
-//import Andy.db4o.Database.DatabaseManager;
-//import Andy.db4o.Database.DepartmentImplementation;
-//import Andy.db4o.Database.EmployeeImplementation;
+/*import Andy.Hibernate.Database.DatabaseManager;
+import Andy.Hibernate.Database.DepartmentImplementation;
+import Andy.Hibernate.Database.EmployeeImplementation;*/
 
-//import Hugo.PostgreSQL.DatabaseManager;
-//import Hugo.PostgreSQL.DepartmentImplementation;
-//import Hugo.PostgreSQL.EmployeeImplementation;
+/*import Andy.db4o.Database.DatabaseManager;
+import Andy.db4o.Database.DepartmentImplementation;
+import Andy.db4o.Database.EmployeeImplementation;*/
 
-import Toni.PlainText.DatabaseManager;
-import Toni.PlainText.DepartmentImplementation;
-import Toni.PlainText.EmployeeImplementation;
+import Hugo.PostgreSQL.DatabaseManager;
+import Hugo.PostgreSQL.DepartmentImplementation;
+import Hugo.PostgreSQL.EmployeeImplementation;
+
+/*
+import Toni.MongoDB.DatabaseManager;
+import Toni.MongoDB.DepartmentImplementation;
+import Toni.MongoDB.EmployeeImplementation;
+*/
 
 import Models.Department;
 import Models.Employee;
@@ -41,9 +47,8 @@ public class UserInteractions {
         String name = setValidDepName();
         String address = setValidAddress();
         Department departmentInput = new Department(id, name, address);
-        if(ValidationUtil.isValidObject(departmentInput, Department.class)) {
+        if (ValidationUtil.isValidObject(departmentInput, Department.class)) {
             department.addDepartment(departmentInput);
-            System.out.println("Department created!");
         } else {
             System.out.println("Department is not valid");
         }
@@ -56,9 +61,8 @@ public class UserInteractions {
 //            departmentList.forEach(System.out::println);
             int id = setValidDepartmentId(departmentList);
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == id)) {
-                System.out.println("Department with id: "+id+" not found!");
-            }
-            else {
+                System.out.println("Department with id: " + id + " not found!");
+            } else {
                 department.updateDepartment(id);
                 done = true;
             }
@@ -91,9 +95,7 @@ public class UserInteractions {
     }
 
     public void printAllDepartments() {
-        for(Department dep : findAllDepartmentInteraction()){
-            System.out.println(dep);
-        }
+        findAllDepartmentInteraction().forEach(System.out::println);
     }
 
     public void addEmployeeInteraction() {
@@ -105,9 +107,10 @@ public class UserInteractions {
         if (optionalDepartment.isPresent()) {
             Department employeeDepartment = optionalDepartment.get();
             Employee employeeInput = new Employee(name, position, id, employeeDepartment);
-            if(ValidationUtil.isValidObject(employeeInput, Employee.class)) {
+            System.out.println(employeeInput);
+            if (ValidationUtil.isValidObject(employeeInput, Employee.class)) {
                 employee.addEmployee(employeeInput);
-                System.out.println("Employee created!");
+                //System.out.println("Employee created!");
             } else {
                 System.out.println("Employee is not valid");
             }
@@ -127,21 +130,23 @@ public class UserInteractions {
 
     public void deleteEmployeeInteraction() {
         findAllEmployeeInteraction().forEach(System.out::println);
-        System.out.println("Set employee ID for update: ");
+        System.out.println("Employee ID to delete: ");
         int id = scan.nextInt();
         scan.nextLine();
         if (ValidationUtil.isValidEmployeeId(id)) {
-            employee.deleteEmployee(id);
-            System.out.println("Employee with id: "+id+" deleted!");
+            if (employee.deleteEmployee(id))
+                System.out.println("Employee with id: " + id + " deleted!");
         } else {
             System.out.println("Employee ID is not valid");
         }
     }
 
     public void findEmployeeInteraction() {
+        //System.out.println("Employee ID to find: ");
+        //scan.nextLine();
         int id = setValidEmployeeId(findAllEmployeeInteraction());
         if (ValidationUtil.isValidEmployeeId(id)) {
-            System.out.println(employee.findEmployeeByID(id));
+            employee.findEmployeeByID(id);
         } else {
             System.out.println("Employee ID is not valid");
         }
@@ -161,64 +166,67 @@ public class UserInteractions {
     }
 
 
-    private String setValidEmployeeName(){
+    private String setValidEmployeeName() {
         String name;
         boolean done = false;
         do {
             name = getTextScanned("Set employee Name: ");
             if (ValidationUtil.isValidEmployeeName(name)) {
                 done = true;
-            }else{
+            } else {
                 System.out.println("Employee name must be Valid");
             }
-        }while (!done);
+        } while (!done);
         return name;
     }
-    private String setValidEmployeePosition(){
+
+    private String setValidEmployeePosition() {
         String position;
         boolean done = false;
         do {
             position = getTextScanned("Set employee position: ");
             if (ValidationUtil.isValidEmployeePosition(position)) {
                 done = true;
-            }else{
+            } else {
                 System.out.println("Employee position must be Valid");
             }
-        }while (!done);
+        } while (!done);
         return position;
     }
-    private int setValidEmployeeId(List<Employee> employeeList){
+
+    private int setValidEmployeeId(List<Employee> employeeList) {
         int id;
         boolean done = false;
         do {
+            //employeeList.forEach(System.out::println);
             id = Integer.parseInt(setValidEmpId());
             int finalId = id;
             if (!employeeList.stream().noneMatch(employee -> employee.getEmployeeID() == finalId)) {
                 done = true;
-            }else{
-                System.out.println("Department with id: "+id+" not found!");
+            } else {
+                System.out.println("Employee with id: " + id + " not found!");
             }
-        }while (!done);
+        } while (!done);
         return id;
     }
 
-    private String setValidEmpId(){
+    private String setValidEmpId() {
         String id;
         boolean done = false;
         do {
             id = getTextScanned("Set employee ID: ");
             try {
-                if (ValidationUtil.isValidDepartmentId(Integer.parseInt(id))) {
+                if (ValidationUtil.isValidEmployeeId(Integer.parseInt(id))) {
                     done = true;
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Employee ID must be a number");
             }
-        }while (!done);
+        } while (!done);
         return id;
     }
 
-    private String setValidDepId(){
+    private String setValidDepId() {
         String id;
         boolean done = false;
         do {
@@ -230,11 +238,11 @@ public class UserInteractions {
             } catch (NumberFormatException e) {
                 System.out.println("Department ID must be a number");
             }
-        }while (!done);
+        } while (!done);
         return id;
     }
 
-    private String setValidDepName(){
+    private String setValidDepName() {
         String name;
         boolean done = false;
         do {
@@ -246,11 +254,11 @@ public class UserInteractions {
             } catch (NumberFormatException e) {
                 System.out.println("Department name must be Valid");
             }
-        }while (!done);
+        } while (!done);
         return name;
     }
 
-    private String setValidAddress(){
+    private String setValidAddress() {
         String address;
         boolean done = false;
         do {
@@ -262,40 +270,56 @@ public class UserInteractions {
             } catch (NumberFormatException e) {
                 System.out.println("Department Address must be Valid");
             }
-        }while (!done);
+        } while (!done);
         return address;
     }
 
-    private int setValidDepartmentId(List<Department> departmentList){
+    private int setValidDepartmentId(List<Department> departmentList) {
         int id;
         boolean done = false;
         do {
+            //departmentList.forEach(System.out::println);
             id = Integer.parseInt(setValidDepId());
             int finalId = id;
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {
-                System.out.println("Department with id: "+id+" not found!");
-            }
-            else {
+                System.out.println("Department with id: " + id + " not found!");
+            } else {
                 done = true;
             }
         } while (!done);
         return id;
     }
 
-    private int existDepid(List<Department> departmentList){
+    private int existDepid(List<Department> departmentList) {
         int id;
         boolean done = false;
         do {
             id = Integer.parseInt(setValidDepId());
             int finalId = id;
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {
-                System.out.println("Department with id: "+id+" valid");
+                System.out.println("Department with id: " + id + " valid");
                 done = true;
-            }
-            else {
-                System.out.println("Department with id: "+id+" not valid!");
+            } else {
+                System.out.println("Department with id: " + id + " not valid!");
             }
         } while (!done);
         return id;
+    }
+
+    private int askForID(String message) {
+        try {
+            System.out.println(message);
+            int id = scan.nextInt();
+            scan.nextLine();
+            return id;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input");
+        }
+        return 0;
+    }
+
+    private String askForText(String message) {
+        System.out.println(message);
+        return scan.nextLine();
     }
 }
