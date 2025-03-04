@@ -38,9 +38,7 @@ public class EmployeeImplementation implements EmployeeDAO {
         int lastId = findAllEmployees().size();
         MongoCollection<Document> equiposCollection = dbAccess.getCollection(Constants.EMPLOYEE_COLLECTION);
         Employee emp = new Employee(employee);
-        emp.setDepartmentID(employee.getDepartmentID());
         emp.setEmployeeID(lastId+1);
-
         equiposCollection.insertOne(emp.toDocument());
     }
 
@@ -53,24 +51,12 @@ public class EmployeeImplementation implements EmployeeDAO {
     public Optional<Models.Employee> updateEmployee(Object id) {
         Optional<Models.Employee> result = Optional.empty();
         Map<String, String> data = getValuesToUpdate();
-        for (String key : data.keySet()) {
-            System.out.println(key + " : " + data.get(key));
-        }
         Department department = new Department(dbAccess.getDepartamentDoc(Integer.parseInt(data.get("department"))));
-
-        System.out.println(department.getDepartmentName());
-        System.out.println(department.getDepartmentID());
-        // Ensure the department document is valid
-        if (department != null) {
-            dbAccess.updateEmployee((int) id, data.get("name"), data.get("position"), department);
-            Document employeeDoc = dbAccess.getEmployeeDocById((int) id);
-            if (employeeDoc != null) {
-                result = Optional.of(new Employee(employeeDoc));
-            }
-        } else {
-            System.out.println("Invalid department ID provided.");
+        dbAccess.updateEmployee((int)id, data.get("name"), data.get("position"),department);
+        Document employeeDoc = dbAccess.getEmployeeDocById((int)id);
+        if (employeeDoc != null){
+            result = Optional.of(new Employee(employeeDoc));
         }
-
         return result;
     }
 
@@ -83,7 +69,6 @@ public class EmployeeImplementation implements EmployeeDAO {
     public boolean deleteEmployee(Object id) {
         boolean result = false;
         Document depDoc = dbAccess.getEmployeeDocById((int)id);
-
         if (depDoc != null){
             result = dbAccess.deleteEmployee((int)id);
         }
@@ -134,6 +119,9 @@ public class EmployeeImplementation implements EmployeeDAO {
             nameScanned = setValidEmployeeName();
             positionScanned = setValidEmployeePosition();
             System.out.println("Type here future Department from this choice using index: ");
+            for (Document dep : allDep){
+                System.out.printf("%n| %s: %s", dep.get("id"),dep.get("name"));
+            }
             departmentScanned = String.valueOf(setValidDepartmentId(allDep));
             if (ValidationUtil.isValidDepartmentId(Integer.parseInt(departmentScanned)) &&
                 ValidationUtil.isValidEmployeeName(nameScanned) &&

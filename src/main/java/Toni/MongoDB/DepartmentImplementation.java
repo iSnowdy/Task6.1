@@ -62,10 +62,10 @@ public class DepartmentImplementation implements DepartmentDAO {
         String nameScanned ="";
         String addressScanned ="";
         do {
-            System.out.println("%n Text can be empty if won't want to be update");
+            System.out.println("Text can be empty if won't want to be update");
             System.out.println("Type here the new name: ");
             nameScanned = scanner.next();
-            System.out.println("%n Type here the new address: ");
+            System.out.println("Type here the new address: ");
             addressScanned = scanner.next();
             if (!nameScanned.isEmpty() || !addressScanned.isEmpty()){
                 setted = true;
@@ -104,7 +104,6 @@ public class DepartmentImplementation implements DepartmentDAO {
     public Optional<Models.Department> findDepartmentByID(Object id) {
         Optional<Models.Department> result = Optional.empty();
         Document depDoc = dbAccess.getDepartamentDoc((int)id);
-        System.out.println(depDoc);
         if (depDoc != null){
             result = Optional.of(new Department(depDoc));
         }
