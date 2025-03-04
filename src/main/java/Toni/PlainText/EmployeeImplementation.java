@@ -93,7 +93,9 @@ public class EmployeeImplementation implements EmployeeDAO {
      */
     @Override
     public Optional<Employee> findEmployeeByID(Object id) {
-        return Optional.ofNullable(dbManager.getEmployeeByID((int) id));
+        Employee employee = dbManager.getEmployeeByID((int) id);
+        System.out.println(employee);
+        return Optional.ofNullable(employee);
     }
 
     /**

@@ -108,15 +108,9 @@ public class DatabaseManager {
      */
     public void updateDepartment(int id, String name, String address ){
         Document query = new Document("id", id); //eq()
-        Document update; // set()
-        if (name.isEmpty()){
-            update = new Document("address", address);
-        } else if (address.isEmpty()) {
-            update = new Document("name", name);
-        } else  {
-            update = new Document("name", name).append("address", address);
-        }
-        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(eq(query), update);
+        Document update = new Document("name", name).append("address", address);
+        Document setData = new Document("$set", update);
+        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(query, setData);
 
     }
 

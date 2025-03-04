@@ -86,6 +86,7 @@ public class EmployeeImplementation implements EmployeeDAO {
         Document employeeDoc = dbAccess.getEmployeeDocById((int)id);
         if (employeeDoc != null) {
             result = Optional.of(new Employee(employeeDoc));
+            System.out.println(result);
         }
 
         return result;

@@ -17,7 +17,7 @@ public class Employee extends Models.Employee {
     @BsonProperty("position")
     private String employeePosition;
 
-    @BsonProperty("departmentId")
+    @BsonProperty("department_id")
     private int departmentID; // FK references Department
 
     public Employee(String employeeName, String employeePosition, Department department) {
