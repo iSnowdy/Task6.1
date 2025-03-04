@@ -38,7 +38,7 @@ public class ObjectFieldsUtil {
             scanner.nextLine(); // Consume buffer
         } catch (InputMismatchException e) {
             System.out.println("Please enter an integer. Returning...");
-            throw new DatabaseUpdateException("Input mismatch");
+            return Optional.empty();
         }
 
         return validateAndReturnField(selectableFields, fieldIndex);
