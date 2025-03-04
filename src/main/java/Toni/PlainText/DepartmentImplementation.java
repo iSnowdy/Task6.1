@@ -69,11 +69,19 @@ public class DepartmentImplementation implements DepartmentDAO {
     @Override
     public Optional<Department> deleteDepartment(Object id) {
         Department department = dbManager.getDepartmentById((int) id);
-        if (department != null) {
-            dbManager.deleteDepartment((int) id, file);
-            return Optional.of(department);
+        Optional<Department> result = Optional.of(department);
+        if(dbManager.getEmployeeList().stream().noneMatch(employee -> employee.getDepartmentID() == (int) id)){
+            if (department != null) {
+                dbManager.deleteDepartment((int) id, file);
+            }
+            else{
+                result = Optional.empty();
+            }
+        }else{
+            System.out.println("Department has employees, can't be deleted");
+                result = Optional.empty();
         }
-        return Optional.empty();
+        return result;
     }
 
     /**

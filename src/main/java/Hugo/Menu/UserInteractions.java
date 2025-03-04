@@ -8,9 +8,9 @@ package Hugo.Menu;
 //import Hugo.PostgreSQL.DepartmentImplementation;
 //import Hugo.PostgreSQL.EmployeeImplementation;
 
-import Toni.MongoDB.DatabaseManager;
-import Toni.MongoDB.DepartmentImplementation;
-import Toni.MongoDB.EmployeeImplementation;
+import Toni.PlainText.DatabaseManager;
+import Toni.PlainText.DepartmentImplementation;
+import Toni.PlainText.EmployeeImplementation;
 
 import Models.Department;
 import Models.Employee;
@@ -91,7 +91,9 @@ public class UserInteractions {
     }
 
     public void printAllDepartments() {
-        findAllDepartmentInteraction().forEach(System.out::println);
+        for(Department dep : findAllDepartmentInteraction()){
+            System.out.println(dep);
+        }
     }
 
     public void addEmployeeInteraction() {
@@ -103,7 +105,6 @@ public class UserInteractions {
         if (optionalDepartment.isPresent()) {
             Department employeeDepartment = optionalDepartment.get();
             Employee employeeInput = new Employee(name, position, id, employeeDepartment);
-            System.out.println(employeeInput);
             if(ValidationUtil.isValidObject(employeeInput, Employee.class)) {
                 employee.addEmployee(employeeInput);
                 System.out.println("Employee created!");
@@ -138,11 +139,9 @@ public class UserInteractions {
     }
 
     public void findEmployeeInteraction() {
-        System.out.println("Set employee ID for update: ");
-        scan.nextLine();
         int id = setValidEmployeeId(findAllEmployeeInteraction());
         if (ValidationUtil.isValidEmployeeId(id)) {
-            employee.findEmployeeByID(id);
+            System.out.println(employee.findEmployeeByID(id));
         } else {
             System.out.println("Employee ID is not valid");
         }
@@ -192,7 +191,6 @@ public class UserInteractions {
         int id;
         boolean done = false;
         do {
-            employeeList.forEach(System.out::println);
             id = Integer.parseInt(setValidEmpId());
             int finalId = id;
             if (!employeeList.stream().noneMatch(employee -> employee.getEmployeeID() == finalId)) {
@@ -272,7 +270,6 @@ public class UserInteractions {
         int id;
         boolean done = false;
         do {
-            departmentList.forEach(System.out::println);
             id = Integer.parseInt(setValidDepId());
             int finalId = id;
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {
@@ -289,7 +286,6 @@ public class UserInteractions {
         int id;
         boolean done = false;
         do {
-            departmentList.forEach(System.out::println);
             id = Integer.parseInt(setValidDepId());
             int finalId = id;
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {

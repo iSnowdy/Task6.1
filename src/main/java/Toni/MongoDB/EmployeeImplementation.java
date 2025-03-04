@@ -38,8 +38,11 @@ public class EmployeeImplementation implements EmployeeDAO {
         int lastId = findAllEmployees().size();
         MongoCollection<Document> equiposCollection = dbAccess.getCollection(Constants.EMPLOYEE_COLLECTION);
         Employee emp = new Employee(employee);
+        emp.setDepartmentID(employee.getDepartmentID());
         emp.setEmployeeID(lastId+1);
+
         equiposCollection.insertOne(emp.toDocument());
+        System.out.println(emp);
     }
 
     /**
@@ -52,11 +55,17 @@ public class EmployeeImplementation implements EmployeeDAO {
         Optional<Models.Employee> result = Optional.empty();
         Map<String, String> data = getValuesToUpdate();
         Department department = new Department(dbAccess.getDepartamentDoc(Integer.parseInt(data.get("department"))));
-        dbAccess.updateEmployee((int)id, data.get("name"), data.get("position"),department);
-        Document employeeDoc = dbAccess.getEmployeeDocById((int)id);
-        if (employeeDoc != null){
-            result = Optional.of(new Employee(employeeDoc));
+
+        if (department != null) {
+            dbAccess.updateEmployee((int) id, data.get("name"), data.get("position"), department);
+            Document employeeDoc = dbAccess.getEmployeeDocById((int) id);
+            if (employeeDoc != null) {
+                result = Optional.of(new Employee(employeeDoc));
+            }
+        } else {
+            System.out.println("Invalid department ID provided.");
         }
+
         return result;
     }
 
