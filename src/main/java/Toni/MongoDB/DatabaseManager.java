@@ -81,6 +81,7 @@ public class DatabaseManager {
     public Document getDepartamentDoc(int id){
         MongoCollection<Document> equiposCollection = getCollection(Constants.DEPARTMENT_COLLECTION);
         Document query = new Document("id",id);
+        System.out.println(equiposCollection.find(query).first().toJson());
         return equiposCollection.find(query).first();
     }
 
@@ -106,20 +107,11 @@ public class DatabaseManager {
      * @param address the new address of the department.
      */
     public void updateDepartment(int id, String name, String address ){
-        Document query = new Document("id", id);
-        Document setData = new Document();
+        Document query = new Document("id", id); //eq()
+        Document update = new Document("name", name).append("address", address);
+        Document setData = new Document("$set", update);
+        getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(query, setData);
 
-        if (name != null && !name.isEmpty()) {
-            setData.append("name", name);
-        }
-        if (address != null && !address.isEmpty()) {
-            setData.append("address", address);
-        }
-
-        if (!setData.isEmpty()) {
-            Document update = new Document("$set", setData);
-            getCollection(Constants.DEPARTMENT_COLLECTION).updateOne(query, update);
-        }
     }
 
     /**
@@ -128,18 +120,7 @@ public class DatabaseManager {
      */
     public void deleteDepartamento(int id) {
         Document filtro = new Document("id", id);
-        getCollection(Constants.DEPARTMENT_COLLECTION).deleteOne(filtro);
-    }
-
-    /**
-     * Retrieves an employee document by its ID.
-     * @param id the ID of the employee.
-     * @return the employee document.
-     */
-    public Document getEmployeeDocByDepId(int id){
-        MongoCollection<Document> equiposCollection = getCollection(Constants.EMPLOYEE_COLLECTION);
-        Document query = new Document("departmentId",id);
-        return equiposCollection.find(query).first();
+        getCollection(Constants.DEPARTMENT_COLLECTION).deleteOne(eq(filtro));
     }
 
     /**
@@ -162,7 +143,7 @@ public class DatabaseManager {
      */
     public boolean deleteEmployee(int id) {
         Document filtro = new Document("id", id);
-        return getCollection(Constants.EMPLOYEE_COLLECTION).deleteOne(filtro).getDeletedCount() > 0;
+        return getCollection(Constants.EMPLOYEE_COLLECTION).deleteOne(eq(filtro)).getDeletedCount() > 0;
     }
 
     /**
@@ -185,6 +166,7 @@ public class DatabaseManager {
      */
     public void updateEmployee(int id, String name, String position, Department department ){
         Document query = new Document("id", id);
+        Document update = new Document();
         Document setData = new Document();
 
         if (!name.isEmpty()) {
@@ -194,12 +176,12 @@ public class DatabaseManager {
             setData.append("position", position);
         }
         if (department != null) {
-            setData.append("department_id", department.getDepartmentID());
+            setData.append("department", department.toDocument());
         }
 
         if (!setData.isEmpty()) {
-            Document update = new Document("$set", setData);
-            getCollection(Constants.EMPLOYEE_COLLECTION).updateOne(query, update);
+            update.append("$set", setData);
+            getCollection(Constants.EMPLOYEE_COLLECTION).updateOne(eq(query), update);
         }
 
     }

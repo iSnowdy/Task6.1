@@ -7,9 +7,6 @@ import org.bson.types.ObjectId;
 
 public class Department extends Models.Department {
 
-//        @Column(name = "nombre", length = 14)
-//        @Column(name = "ubicacion", length = 13)
-
     @BsonId
     private ObjectId department_ID; // PK
     @BsonProperty("id")
