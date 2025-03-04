@@ -4,6 +4,7 @@ import Andy.Hibernate.Database.DatabaseManager;
 //import Andy.db4o.Database.DatabaseManager;
 //import Hugo.PostgreSQL.DatabaseManager;
 //import Toni.MongoDB.DatabaseManager;
+
 import java.util.Scanner;
 
 public class Menu {
@@ -18,7 +19,6 @@ public class Menu {
 
     public void menuStart() {
         boolean close = false;
-        //manager.openDB();
 
         while (!close) {
             menu();
