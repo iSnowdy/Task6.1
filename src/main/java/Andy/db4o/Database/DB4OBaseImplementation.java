@@ -138,11 +138,17 @@ public abstract class DB4OBaseImplementation<T> {
     // the field to the new value and then stores it in db4o.
     private Optional<T> modifyObjectField(T object, Field field) {
         try {
+            Object oldValue = field.get(object);
             Object newValue = ObjectFieldsUtil.promptUserForNewValue(field);
 
             field.set(object, newValue);
 
-            if (!ValidationUtil.isValidObject(object, clazz)) return Optional.empty();
+            // If it is not valid return the object back to its original state
+            if (!ValidationUtil.isValidObject(object, clazz)) {
+                System.out.println("New value is not valid");
+                field.set(object, oldValue);
+                return Optional.empty();
+            }
 
             // I do not call here my method because we can't validate repeated
             dbManager.getDb4oContainer().store(object);

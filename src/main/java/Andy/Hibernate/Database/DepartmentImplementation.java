@@ -40,9 +40,6 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
 
     @Override
     public boolean addDepartment(Models.Department department) {
-        System.out.println("Inside implementation...");
-        System.out.println(department);
-
         HDepartment hDepartment =
                 new HDepartment(department);
 
@@ -70,7 +67,7 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
 
         // Convert HDepartment to Models.Department if present
         return hDepartmentOptional.map(hDept -> new Models.Department(
-                hDept.getDepartmentID(),
+                hDept.getID(),
                 hDept.getDepartmentName(),
                 hDept.getDepartmentAddress()
         ));
@@ -103,11 +100,11 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
 
     @Override
     protected boolean canDeleteObject(HDepartment department) {
-        String hql = "SELECT COUNT(e) FROM HEmployee e WHERE e.id = :depID";
+        String hql = "SELECT COUNT(e) FROM HEmployee e WHERE e.HDepartment.id = :depID";
 
         try (Session session = openSession()) {
             Long count = session.createQuery(hql, Long.class)
-                    .setParameter("depID", department.getDepartmentID())
+                    .setParameter("depID", department.getID())
                     .getSingleResult();
 
             if (count > 0) {
@@ -116,7 +113,7 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
             }
             return true;
         } catch (Exception e) {
-            throw new DatabaseQueryException("Could not check employees for department ID " + department.getDepartmentID(), e);
+            throw new DatabaseQueryException("Could not check employees for department ID " + department.getID(), e);
         }
     }
 
@@ -131,7 +128,7 @@ public class DepartmentImplementation extends HibernateBaseImplementation<HDepar
     @Override
     public Optional<Models.Department> findDepartmentByID(Object id) {
         Optional<HDepartment> hDepartmentOptional = getObject(id);
-        return hDepartmentOptional.map(hDept -> new Models.Department(hDept.getDepartmentID(), hDept.getDepartmentName(), hDept.getDepartmentAddress()));
+        return hDepartmentOptional.map(hDept -> new Models.Department(hDept.getID(), hDept.getDepartmentName(), hDept.getDepartmentAddress()));
     }
 
     /**

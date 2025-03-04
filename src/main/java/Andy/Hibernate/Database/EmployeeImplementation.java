@@ -66,9 +66,9 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
         return hEmployeeOptional.map(hEmp -> new Models.Employee(
                 hEmp.getEmployeeName(),
                 hEmp.getEmployeePosition(),
-                hEmp.getDepartment().getDepartmentID(),
+                hEmp.getDepartment().getID(),
                 new Models.Department(
-                        hEmp.getDepartment().getDepartmentID(),
+                        hEmp.getDepartment().getID(),
                         hEmp.getDepartment().getDepartmentName(),
                         hEmp.getDepartment().getDepartmentAddress()
                 )
@@ -111,9 +111,9 @@ public class EmployeeImplementation extends HibernateBaseImplementation<HEmploye
         return hEmployeeOptional.map(hEmp -> new Models.Employee(
                 hEmp.getEmployeeName(),
                 hEmp.getEmployeePosition(),
-                hEmp.getDepartment().getDepartmentID(),
+                hEmp.getDepartment().getID(),
                 new Models.Department(
-                        hEmp.getDepartment().getDepartmentID(),
+                        hEmp.getDepartment().getID(),
                         hEmp.getDepartment().getDepartmentName(),
                         hEmp.getDepartment().getDepartmentAddress()
                 )
