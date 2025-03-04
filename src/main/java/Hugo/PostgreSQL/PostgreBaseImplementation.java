@@ -18,18 +18,35 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Abstract base implementation for managing PostgreSQL database operations for a specific type T.
+ *
+ * @param <T> The type of the entity being managed.
+ */
 public abstract class PostgreBaseImplementation<T> {
     private final Class<T> clazz; // To know the type of class being managed
     private final DatabaseManager dbManager;
 
     private final String pk;
 
+    /**
+     * Constructor to initialize the PostgreBaseImplementation with the specified class type and database manager.
+     *
+     * @param clazz     The class type of the entity being managed.
+     * @param dbManager The database manager for handling database connections.
+     */
     public PostgreBaseImplementation(Class<T> clazz, DatabaseManager dbManager) {
         this.clazz = clazz;
         this.dbManager = dbManager;
         this.pk = clazz.getDeclaredFields()[0].getName();
     }
 
+    /**
+     * Checks if a department exists in the database.
+     *
+     * @param department The department to check.
+     * @return true if the department exists, false otherwise.
+     */
     private boolean isDepartmentInDB(Department department) {
         String query = "SELECT * FROM department WHERE depno = ?";
         try (Connection connection = dbManager.getConnection();
@@ -42,6 +59,12 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Stores a department in the PostgreSQL database.
+     *
+     * @param department The department to store.
+     * @return true if the department was successfully stored, false otherwise.
+     */
     public boolean storePostgreDepartment(Department department) {
         if (!isDepartmentInDB(department)) {
             String query = "INSERT INTO department (depno, nombre, ubicacion) VALUES (?, ?, ?)";
@@ -60,6 +83,12 @@ public abstract class PostgreBaseImplementation<T> {
         return false;
     }
 
+    /**
+     * Updates a department in the PostgreSQL database.
+     *
+     * @param depno The department number to update.
+     * @return An Optional containing the updated department if successful, or an empty Optional if not.
+     */
     public Optional<Department> updatePostgreDepartment(Integer depno) {
         Optional<Department> departmentOptional = getDepartment(depno);
         if (departmentOptional.isEmpty()) {
@@ -68,7 +97,7 @@ public abstract class PostgreBaseImplementation<T> {
         }
 
         Department departmentToUpdate = departmentOptional.get();
-        Set<String> excludedFields = Set.of("depno"); // Exclude primary key from modification
+        Set<String> excludedFields = Set.of("departmentID"); // Exclude primary key from modification
 
         Optional<Field> fieldToUpdate = ObjectFieldsUtil.promptUserForFieldSelection(departmentToUpdate, excludedFields);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
@@ -76,6 +105,13 @@ public abstract class PostgreBaseImplementation<T> {
         return modifyDepartmentField(departmentToUpdate, fieldToUpdate.get());
     }
 
+    /**
+     * Modifies a specific field of a department in the PostgreSQL database.
+     *
+     * @param department The department to modify.
+     * @param field      The field to modify.
+     * @return An Optional containing the modified department if successful, or an empty Optional if not.
+     */
     private Optional<Department> modifyDepartmentField(Department department, Field field) {
         String column;
         try {
@@ -104,6 +140,12 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Deletes a department from the PostgreSQL database.
+     *
+     * @param department The department to delete.
+     * @return true if the department was successfully deleted, false otherwise.
+     */
     public boolean deletePostgreDepartment(Department department) {
         if (isDepartmentInDB(department)) {
             String checkEmployeesQuery = "SELECT COUNT(*) AS employee_count FROM employee WHERE depno = ?";
@@ -134,6 +176,12 @@ public abstract class PostgreBaseImplementation<T> {
         return false;
     }
 
+    /**
+     * Retrieves a department from the PostgreSQL database by its department number.
+     *
+     * @param depno The department number to retrieve.
+     * @return An Optional containing the department if found, or an empty Optional if not.
+     */
     public Optional<Department> getDepartment(Integer depno) {
         String query = "SELECT * FROM department WHERE depno = ?";
         try (Connection connection = dbManager.getConnection();
@@ -154,6 +202,11 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Retrieves all departments from the PostgreSQL database.
+     *
+     * @return A list of all departments.
+     */
     public List<Department> getAllPostgreDepartments() {
         String query = "SELECT * FROM department";
         List<Department> departments = new ArrayList<>();
@@ -175,6 +228,12 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Stores an employee in the PostgreSQL database.
+     *
+     * @param employee The employee to store.
+     * @return true if the employee was successfully stored, false otherwise.
+     */
     public boolean storePostgreEmployee(Employee employee) {
         String query = "INSERT INTO employee (nombre, puesto, depno) VALUES (?,?,?)";
         try {
@@ -183,7 +242,6 @@ public abstract class PostgreBaseImplementation<T> {
             pstmt.setString(1, employee.getEmployeeName());
             pstmt.setString(2, employee.getEmployeePosition());
             pstmt.setInt(3, employee.getDepartmentID());
-            System.out.println(pstmt.toString());
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -191,6 +249,12 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Checks if an employee exists in the database.
+     *
+     * @param employee The employee to check.
+     * @return true if the employee exists, false otherwise.
+     */
     private boolean isEmployeeInDB(Employee employee) {
         String query = "SELECT * FROM employee WHERE empno = ?";
         try (Connection connection = dbManager.getConnection();
@@ -203,6 +267,12 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Updates an employee in the PostgreSQL database.
+     *
+     * @param empno The employee number to update.
+     * @return An Optional containing the updated employee if successful, or an empty Optional if not.
+     */
     public Optional<Employee> updatePostgreEmployee(Integer empno) {
         Optional<Employee> employeeOptional = getEmployee(empno);
         if (employeeOptional.isEmpty()) {
@@ -211,15 +281,22 @@ public abstract class PostgreBaseImplementation<T> {
         }
 
         Employee employeeToUpdate = employeeOptional.get();
-        Set<String> excludedFields = Set.of("empno"); // Exclude primary key from modification
+        Set<String> excludedFields = Set.of("employeeID", "departmentID", "department"); // Exclude primary key from modification
 
         Optional<Field> fieldToUpdate = ObjectFieldsUtil.promptUserForFieldSelection(employeeToUpdate, excludedFields);
         if (fieldToUpdate.isEmpty()) return Optional.empty();
 
-        return modifyDepartmentField(employeeToUpdate, fieldToUpdate.get());
+        return modifyEmployeeField(employeeToUpdate, fieldToUpdate.get());
     }
 
-    private Optional<Employee> modifyDepartmentField(Employee employee, Field field) {
+    /**
+     * Modifies a specific field of an employee in the PostgreSQL database.
+     *
+     * @param employee The employee to modify.
+     * @param field    The field to modify.
+     * @return An Optional containing the modified employee if successful, or an empty Optional if not.
+     */
+    private Optional<Employee> modifyEmployeeField(Employee employee, Field field) {
         String column;
         try {
             Object newValue = ObjectFieldsUtil.promptUserForNewValue(field);
@@ -249,6 +326,12 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Deletes an employee from the PostgreSQL database.
+     *
+     * @param employee The employee to delete.
+     * @return true if the employee was successfully deleted, false otherwise.
+     */
     public boolean deletePostgreEmployee(Employee employee) {
         if (isEmployeeInDB(employee)) {
             String query = "DELETE FROM employee WHERE empno = ?";
@@ -264,6 +347,12 @@ public abstract class PostgreBaseImplementation<T> {
         return false;
     }
 
+    /**
+     * Retrieves an employee from the PostgreSQL database by its employee number.
+     *
+     * @param empno The employee number to retrieve.
+     * @return An Optional containing the employee if found, or an empty Optional if not.
+     */
     public Optional<Employee> getEmployee(Integer empno) {
         String query = "SELECT * FROM employee WHERE empno = ?";
         try (Connection connection = dbManager.getConnection();
@@ -285,6 +374,11 @@ public abstract class PostgreBaseImplementation<T> {
         }
     }
 
+    /**
+     * Retrieves all employees from the PostgreSQL database.
+     *
+     * @return A list of all employees.
+     */
     public List<Employee> getAllPostgreEmployees() {
         String query = "SELECT * FROM employee";
         List<Employee> employees = new ArrayList<>();
