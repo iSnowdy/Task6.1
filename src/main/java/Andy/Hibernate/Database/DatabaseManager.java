@@ -22,6 +22,10 @@ public class DatabaseManager implements DatabaseImplementation {
      * @throws DatabaseOpeningException if initialization fails.
      */
 
+    public DatabaseManager() {
+        openDB();
+    }
+
     @Override
     public void openDB() {
         if (!isOpen) {

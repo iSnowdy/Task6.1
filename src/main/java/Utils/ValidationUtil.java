@@ -28,15 +28,15 @@ public class ValidationUtil {
     /**
      * Validates a Hibernate Department model (HDepartment).
      *
-     * @param hDepartment Hibernate Department object.
+     * @param HDepartment Hibernate Department object.
      * @return {@code true} if valid, {@code false} otherwise.
      */
 
-    public static boolean isValidHDepartment(HDepartment hDepartment) {
-        if (hDepartment == null) return false;
-        return isValidDepartmentName(hDepartment.getDepartmentName()) &&
-                isValidDepartmentAddress(hDepartment.getDepartmentAddress()) &&
-                isValidDepartmentId(hDepartment.getId());
+    public static boolean isValidHDepartment(HDepartment HDepartment) {
+        if (HDepartment == null) return false;
+        return isValidDepartmentName(HDepartment.getDepartmentName()) &&
+                isValidDepartmentAddress(HDepartment.getDepartmentAddress()) &&
+                isValidDepartmentId(HDepartment.getId());
     }
 
     /**
@@ -96,16 +96,16 @@ public class ValidationUtil {
     /**
      * Validates a Hibernate Employee model (HEmployee).
      *
-     * @param hEmployee Hibernate Employee object.
+     * @param HEmployee Hibernate Employee object.
      * @return {@code true} if valid, {@code false} otherwise.
      */
 
-    public static boolean isValidHEmployee(HEmployee hEmployee) {
-        if (hEmployee == null) return false;
-        return isValidEmployeeName(hEmployee.getEmployeeName()) &&
-                isValidEmployeePosition(hEmployee.getEmployeePosition()) &&
-                isValidEmployeeId(hEmployee.getId()) &&
-                isValidDepartmentId(hEmployee.getDepartment().getId());
+    public static boolean isValidHEmployee(HEmployee HEmployee) {
+        if (HEmployee == null) return false;
+        return isValidEmployeeName(HEmployee.getEmployeeName()) &&
+                isValidEmployeePosition(HEmployee.getEmployeePosition()) &&
+                isValidEmployeeId(HEmployee.getId()) &&
+                isValidDepartmentId(HEmployee.getDepartment().getId());
     }
 
     /**

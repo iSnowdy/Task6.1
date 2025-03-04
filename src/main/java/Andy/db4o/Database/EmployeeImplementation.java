@@ -40,10 +40,11 @@ public class EmployeeImplementation extends DB4OBaseImplementation<Employee> imp
      * @throws DatabaseInsertException if an error occurs during the insertion.
      */
 
+    // TODO: Employee is not being added
     @Override
     public void addEmployee(Employee employee) {
         if (storeObject(employee)) System.out.println("Employee " + employee.getEmployeeID() + " successfully added");
-        else System.out.println("Employee " + employee.getEmployeeID() + " could not be added");
+        else System.out.println("Employee " + employee.getEmployeeID() + " could not be added to DB4O");
     }
 
     /**
