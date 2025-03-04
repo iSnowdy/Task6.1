@@ -1,16 +1,16 @@
 package Hugo.Menu;
 
-import Andy.Hibernate.Database.DatabaseManager;
+/*import Andy.Hibernate.Database.DatabaseManager;
 import Andy.Hibernate.Database.DepartmentImplementation;
-import Andy.Hibernate.Database.EmployeeImplementation;
+import Andy.Hibernate.Database.EmployeeImplementation;*/
 
 /*import Andy.db4o.Database.DatabaseManager;
 import Andy.db4o.Database.DepartmentImplementation;
 import Andy.db4o.Database.EmployeeImplementation;*/
 
-/*import Hugo.PostgreSQL.DatabaseManager;
+import Hugo.PostgreSQL.DatabaseManager;
 import Hugo.PostgreSQL.DepartmentImplementation;
-import Hugo.PostgreSQL.EmployeeImplementation;*/
+import Hugo.PostgreSQL.EmployeeImplementation;
 
 /*
 import Toni.MongoDB.DatabaseManager;
@@ -49,7 +49,6 @@ public class UserInteractions {
         Department departmentInput = new Department(id, name, address);
         if (ValidationUtil.isValidObject(departmentInput, Department.class)) {
             department.addDepartment(departmentInput);
-            System.out.println("Department created!");
         } else {
             System.out.println("Department is not valid");
         }
@@ -143,8 +142,8 @@ public class UserInteractions {
     }
 
     public void findEmployeeInteraction() {
-        System.out.println("Employee ID to find: ");
-        scan.nextLine();
+        //System.out.println("Employee ID to find: ");
+        //scan.nextLine();
         int id = setValidEmployeeId(findAllEmployeeInteraction());
         if (ValidationUtil.isValidEmployeeId(id)) {
             employee.findEmployeeByID(id);
@@ -199,7 +198,7 @@ public class UserInteractions {
         int id;
         boolean done = false;
         do {
-            employeeList.forEach(System.out::println);
+            //employeeList.forEach(System.out::println);
             id = Integer.parseInt(setValidEmpId());
             int finalId = id;
             if (!employeeList.stream().noneMatch(employee -> employee.getEmployeeID() == finalId)) {
@@ -217,7 +216,7 @@ public class UserInteractions {
         do {
             id = getTextScanned("Set employee ID: ");
             try {
-                if (ValidationUtil.isValidDepartmentId(Integer.parseInt(id))) {
+                if (ValidationUtil.isValidEmployeeId(Integer.parseInt(id))) {
                     done = true;
                 }
             } catch (NumberFormatException e) {
@@ -279,7 +278,7 @@ public class UserInteractions {
         int id;
         boolean done = false;
         do {
-            departmentList.forEach(System.out::println);
+            //departmentList.forEach(System.out::println);
             id = Integer.parseInt(setValidDepId());
             int finalId = id;
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {
@@ -295,7 +294,6 @@ public class UserInteractions {
         int id;
         boolean done = false;
         do {
-            departmentList.forEach(System.out::println);
             id = Integer.parseInt(setValidDepId());
             int finalId = id;
             if (departmentList.stream().noneMatch(department -> department.getDepartmentID() == finalId)) {

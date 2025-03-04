@@ -48,7 +48,9 @@ public class EmployeeImplementation extends PostgreBaseImplementation<Employee> 
         Optional<Employee> employeeOptional= getEmployee((Integer) id);
         if (employeeOptional.isEmpty()) {
             System.out.println("Employee " + id + " not found");
-            return Optional.empty();
+            employeeOptional = Optional.empty();
+        }else {
+            System.out.println(employeeOptional.get().toString());
         }
         return employeeOptional;
     }
