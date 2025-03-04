@@ -132,7 +132,10 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
             session.flush();
             field.set(object, newValue);
 
-            if (!ValidationUtil.isValidObject(object, clazz)) return Optional.empty();
+            if (!ValidationUtil.isValidObject(object, clazz)) {
+                System.out.println("New field value is not valid");
+                return Optional.empty();
+            }
 
             session.merge(object); // Overwrites
             session.getTransaction().commit();
@@ -154,13 +157,9 @@ public abstract class HibernateBaseImplementation<T extends DatabaseEntity> {
      */
 
     protected boolean deleteObject(T object) {
-        if (!isObjectInDB(object)) {
-            return false; // Object does not exist
-        }
+        if (!isObjectInDB(object)) return false; // Object does not exist
 
-        if (!canDeleteObject(object)) {
-            throw new DatabaseDeleteException("Deletion not allowed for " + object.getClass().getSimpleName());
-        }
+        if (!canDeleteObject(object)) return false; // Contains employees
 
         try (Session session = dbManager.openSession()) {
             session.beginTransaction();

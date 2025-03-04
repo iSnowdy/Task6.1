@@ -24,7 +24,9 @@ public class HEmployee extends Models.Employee implements DatabaseEntity {
 
     // Employee ID is auto generated. We should not need to pass it as a parameter to the constructor
     public HEmployee(Models.Employee employee) {
-        super(employee.getEmployeeName(), employee.getEmployeePosition(), employee.getDepartmentID(), employee.getDepartment());
+        this.employeeName = employee.getEmployeeName();
+        this.employeePosition = employee.getEmployeePosition();
+        this.HDepartment = new HDepartment(employee.getDepartment());
     }
 
     /**
@@ -41,7 +43,7 @@ public class HEmployee extends Models.Employee implements DatabaseEntity {
         return
                 HEmployee.employeeName.equals(employeeName) &&
                 HEmployee.employeePosition.equals(employeePosition) &&
-                HEmployee.HDepartment.getId().equals(HDepartment.getId());
+                HEmployee.HDepartment.getId().equals(HDepartment.getID());
     }
 
     @Override
@@ -53,7 +55,7 @@ public class HEmployee extends Models.Employee implements DatabaseEntity {
                 "Employee ID: " + id + "\n" +
                 "Employee Name: " + employeeName + "\n" +
                 "Employee Position: " + employeePosition + "\n" +
-                "Department ID: " + HDepartment.getId() + "\n" +
+                "Department ID: " + HDepartment.getID() + "\n" +
                 "-----------------------\n";
     }
 
