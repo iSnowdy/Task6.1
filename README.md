@@ -1,5 +1,5 @@
 # Task 6.1 - Data Access
-Aa
+
 
 ## Workflow
 
@@ -22,18 +22,3 @@ Aa
 - Evitar devolver null siempre que sea posible.
 - Lanzar excepciones y capturarlas cuando toca (especialmente en lo relacionado a BBDD).
 - Evitar estructuras anidadas (3 if uno dentro del otro).
-
-## Plain file (.txt)
-Aa
-
-## Relational database (PostgreSQL)
-Aa
-
-## ORM (Hibernate with JPA)
-Aa
-
-## Object-oriented database (db4o)
-Aa
-
-## Documented-oriented database (MongoDB)
-Aa
